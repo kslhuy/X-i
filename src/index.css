@@ -1,45 +1,89 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    --color-primary: #1E4D3A;
+    --color-primary-dark: #143527;
+    --color-primary-light: #2E7D52;
+    --color-leaf: #2E7D52;
+    --color-mint: #52B788;
+    --color-clay: #9E4334;
+    --color-cream: #F4F8F5;
+    --color-card-bg: #FFFFFF;
+    --color-card-border: #D4E7D8;
+    --color-text-main: #1D2A22;
+    --color-text-muted: #536B5C;
+  }
+
   body {
-    font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: #E6F4EC;
-    background-image: linear-gradient(rgba(240, 253, 244, 0.85), rgba(240, 253, 244, 0.85)), url('/images/Background.png');
+    font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #F4F8F5;
+    /* Indochine linen & enlarged background icon motif with fresh herbal tea tint */
+    background-image: 
+      radial-gradient(circle at 10% 20%, rgba(244, 248, 245, 0.95), rgba(238, 246, 240, 0.97)),
+      url('/images/Background.png');
     background-repeat: repeat;
-    background-size: auto, 260px auto;
+    background-size: auto, 580px auto;
     background-attachment: fixed;
-    color: #0F172A;
+    color: #1D2A22;
+    -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3, h4, h5, h6, .font-heading {
+  h1, h2, h3, h4, .font-heading {
+    font-family: 'Playfair Display', Georgia, serif;
+    letter-spacing: -0.01em;
+  }
+
+  .font-body {
     font-family: 'Be Vietnam Pro', sans-serif;
-    letter-spacing: -0.02em;
   }
 }
 
-/* Glass & Clean Card Effects */
-.glass-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+/* Indochine Glass & Heritage Card Effects with Lush Green Touch */
+.indochine-header {
+  background: rgba(244, 248, 245, 0.93);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(195, 222, 200, 0.8);
 }
 
-.green-card {
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid #A7F3D0;
-  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.08);
+.heritage-card {
+  background: #FFFFFF;
+  border: 1px solid #D4E7D8;
+  box-shadow: 0 4px 16px -2px rgba(30, 77, 58, 0.06);
 }
 
-/* Custom Scrollbar */
+.vintage-badge {
+  background: #E8F5EE;
+  color: #1E4D3A;
+  border: 1px solid #BFE0C8;
+}
+
+.leaf-badge {
+  background: #E8F5EE;
+  color: #1E4D3A;
+  border: 1px solid #BFE0C8;
+}
+
+.clay-badge {
+  background: #F8ECE8;
+  color: #8C3729;
+  border: 1px solid #EAC8BF;
+}
+
+/* Custom Scrollbar in Fresh Bamboo Green */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #ECFDF5;
+  background: #EAF3EC;
 }
 ::-webkit-scrollbar-thumb {
-  background: #34D399;
+  background: #74C69D;
   border-radius: 9999px;
 }
+::-webkit-scrollbar-thumb:hover {
+  background: #2E7D52;
+}
+

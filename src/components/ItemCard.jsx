@@ -1,25 +1,25 @@
 import React from 'react';
-import { Plus, Flame, Sparkles } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 export default function ItemCard({ item, onAddToCart }) {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-emerald-200/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between p-3.5 group">
+    <div className="bg-white rounded-2xl overflow-hidden border border-[#D4E7D8] shadow-xs hover:shadow-md transition-all flex flex-col justify-between p-3.5 group hover:border-[#ADCDB3]">
       
-      <div className="flex gap-3">
+      <div className="flex gap-3.5">
         {/* Thumbnail Image */}
-        <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-emerald-50 shrink-0 border border-emerald-100">
+        <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-[#E8F5EE] shrink-0 border border-[#C3DEC8]">
           <img
             src={item.image}
             alt={item.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&auto=format&fit=crop&q=80";
             }}
           />
-          {item.isPopular && (
-            <span className="absolute top-1 left-1 bg-amber-500 text-slate-950 text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm">
-              HOT
+          {item.badge && (
+            <span className="absolute top-1 left-1 bg-[#1E4D3A]/90 backdrop-blur-xs text-[#F4F8F5] text-[9px] font-bold px-2 py-0.5 rounded shadow-xs">
+              {item.badge}
             </span>
           )}
         </div>
@@ -27,27 +27,27 @@ export default function ItemCard({ item, onAddToCart }) {
         {/* Dish Info */}
         <div className="flex-1 flex flex-col justify-between">
           <div>
-            <h3 className="font-heading font-bold text-sm sm:text-base text-slate-900 line-clamp-1 group-hover:text-emerald-700 transition-colors">
+            <h3 className="font-heading font-bold text-sm sm:text-base text-[#1D2A22] line-clamp-1 group-hover:text-[#2E7D52] transition-colors">
               {item.name}
             </h3>
-            <p className="text-[11px] text-emerald-800 font-medium mt-0.5">
+            <p className="text-[11px] text-[#2E7D52] font-semibold mt-0.5 line-clamp-1">
               {item.subtitle}
             </p>
-            <p className="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-snug">
+            <p className="text-[11px] text-[#536B5C] line-clamp-2 mt-1 leading-snug font-body">
               {item.description}
             </p>
           </div>
 
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-emerald-50">
-            <span className="text-base font-black text-emerald-950 font-heading">
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#EAF3EC]">
+            <span className="text-base font-bold text-[#1E4D3A] font-heading">
               {item.price.toLocaleString()}đ
             </span>
 
             <button
               onClick={() => onAddToCart(item)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow transition-all flex items-center gap-1 active:scale-95"
+              className="bg-[#1E4D3A] hover:bg-[#143527] text-[#F4F8F5] font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-xs transition-all flex items-center gap-1 active:scale-95 border border-[#143527]"
             >
-              <Plus className="w-3.5 h-3.5 stroke-[3]" />
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Thêm</span>
             </button>
           </div>
@@ -57,3 +57,5 @@ export default function ItemCard({ item, onAddToCart }) {
     </div>
   );
 }
+
+

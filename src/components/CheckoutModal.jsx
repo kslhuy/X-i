@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
-import { X, Send, User, ShoppingBag, CheckCircle, Sparkles, MessageSquare } from 'lucide-react';
+import { X, Send, User, ShoppingBag, CreditCard, MessageSquare, AlertCircle } from 'lucide-react';
+import { STALL_INFO } from '../data/menuData';
 
-export default function CheckoutModal({ isOpen, onClose, cart, pricing, onCompleteOrder }) {
+export default function CheckoutModal({ 
+  isOpen, 
+  onClose, 
+  cart, 
+  pricing, 
+  onCompleteOrder,
+  onOpenPaymentQR 
+}) {
   if (!isOpen) return null;
 
   const [customerName, setCustomerName] = useState('');
-  const [orderType, setOrderType] = useState('EAT_HERE'); // EAT_HERE or TAKEAWAY
+  const [orderType, setOrderType] = useState('EAT_HERE'); // EAT_HERE | TAKEAWAY | WHOLESALE
   const [note, setNote] = useState('');
   const [error, setError] = useState('');
 
@@ -17,38 +25,44 @@ export default function CheckoutModal({ isOpen, onClose, cart, pricing, onComple
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!customerName.trim()) {
-      setError('Vui lòng nhập tên hoặc số thẻ của bạn (Ví dụ: Khách 05)');
+      setError('Vui lòng nhập tên hoặc số bàn/thẻ nhận diện (VD: Bàn 03, Chị Thu)');
       return;
     }
 
+    const orderTypeLabel = 
+      orderType === 'EAT_HERE' ? 'Ăn tại chỗ' : 
+      orderType === 'TAKEAWAY' ? 'Đóng gói mang về' : 'Đặt sỉ / Mâm cỗ';
+
     onCompleteOrder({
-      orderId: 'XÔÏS-' + Math.floor(100 + Math.random() * 900),
+      orderId: 'XP-' + Math.floor(100 + Math.random() * 900),
       customer: {
         name: customerName,
-        phone: orderType === 'EAT_HERE' ? 'Ăn tại chỗ' : 'Mang về',
-        address: orderType === 'EAT_HERE' ? 'Tại bàn / Lề đường' : 'Đóng hộp mang về',
-        paymentMethod: 'Trả tiền sau khi nhận xôi',
-        timeSlot: 'Ngay tại quán'
+        phone: orderTypeLabel,
+        address: orderTypeLabel,
+        paymentMethod: 'Tiền mặt hoặc Chuyển khoản QR',
+        timeSlot: 'Trực tiếp tại quán'
       },
       cart,
       pricing,
+      note,
+      orderType,
       createdAt: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
     });
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-slide-up">
-      <div className="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-emerald-200 p-5 space-y-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#143527]/60 backdrop-blur-sm animate-slide-up">
+      <div className="bg-[#F4F8F5] rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-[#C3DEC8] p-6 space-y-4">
         
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-emerald-100 pb-3">
+        <div className="flex justify-between items-center border-b border-[#D4E7D8] pb-3">
           <div>
-            <span className="text-[10px] font-extrabold uppercase text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-              Đặt Hàng Quét QR Cho Quán
+            <span className="text-[10px] font-bold uppercase text-[#1E4D3A] bg-[#E8F5EE] px-2.5 py-0.5 rounded-full border border-[#BFE0C8]">
+              Làng Nghề Phú Thượng
             </span>
-            <h3 className="font-heading font-black text-lg text-slate-900 mt-0.5">Xác Nhận Đơn Xôi</h3>
+            <h3 className="font-heading font-bold text-lg text-[#1D2A22] mt-0.5">Xác Nhận Đơn Xôi</h3>
           </div>
-          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-700">
+          <button onClick={onClose} className="p-1 text-[#536B5C] hover:text-[#1D2A22]">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -56,29 +70,29 @@ export default function CheckoutModal({ isOpen, onClose, cart, pricing, onComple
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="space-y-4">
           
-          {/* Quick Tag Selector */}
+          {/* Customer Identifier */}
           <div>
-            <label className="text-xs font-bold text-slate-800 mb-1 flex items-center gap-1">
-              <User className="w-3.5 h-3.5 text-emerald-600" /> Tên / Số Thẻ Của Bạn *
+            <label className="text-xs font-bold text-[#1D2A22] mb-1 flex items-center gap-1">
+              <User className="w-3.5 h-3.5 text-[#2E7D52]" /> Tên / Số Bàn / Số Thẻ Nhận Diện *
             </label>
             <input
               type="text"
-              placeholder="VD: Khách 05, Anh Nam, Chị Hà..."
+              placeholder="VD: Bàn 02, Anh Hùng, Chị Mai..."
               value={customerName}
               onChange={(e) => { setCustomerName(e.target.value); setError(''); }}
-              className="w-full text-xs p-3 bg-emerald-50/50 border border-emerald-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
+              className="w-full text-xs p-3 bg-white border border-[#C3DEC8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E4D3A] font-medium text-[#1D2A22]"
             />
-            {error && <p className="text-[11px] text-rose-600 mt-1 font-semibold">{error}</p>}
+            {error && <p className="text-[11px] text-[#9E4334] mt-1 font-semibold">{error}</p>}
 
-            {/* Autofill Tags */}
+            {/* Quick Fill Tags */}
             <div className="flex items-center gap-1.5 mt-2 overflow-x-auto pb-1">
-              <span className="text-[10px] text-slate-400 font-semibold shrink-0">Chọn nhanh:</span>
-              {['Khách 01', 'Khách 02', 'Khách 05', 'Khách 10'].map(tag => (
+              <span className="text-[10px] text-[#869E90] font-semibold shrink-0">Chọn nhanh:</span>
+              {['Bàn 01', 'Bàn 02', 'Bàn 03', 'Mang Về 01', 'Mang Về 02'].map(tag => (
                 <button
                   type="button"
                   key={tag}
                   onClick={() => handleAutofillTag(tag)}
-                  className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-md hover:bg-emerald-200 transition-colors shrink-0"
+                  className="bg-[#E8F5EE] text-[#1E4D3A] text-[10px] font-bold px-2 py-0.5 rounded-md hover:bg-[#DCF0E5] transition-colors shrink-0 border border-[#BFE0C8]"
                 >
                   + {tag}
                 </button>
@@ -86,66 +100,96 @@ export default function CheckoutModal({ isOpen, onClose, cart, pricing, onComple
             </div>
           </div>
 
-          {/* Eat Here or Takeaway */}
+          {/* Service Option */}
           <div>
-            <label className="text-xs font-bold text-slate-800 mb-1.5 block">Hình thức dùng:</label>
-            <div className="grid grid-cols-2 gap-2">
+            <label className="text-xs font-bold text-[#1D2A22] mb-1.5 block">Hình thức phục vụ:</label>
+            <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setOrderType('EAT_HERE')}
-                className={`p-2.5 rounded-xl border text-xs font-bold transition-all ${
+                className={`p-2.5 rounded-xl border text-xs font-bold transition-all text-center ${
                   orderType === 'EAT_HERE'
-                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                    : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-300'
+                    ? 'bg-[#1E4D3A] text-[#F4F8F5] border-[#1E4D3A] shadow-xs'
+                    : 'bg-white text-[#536B5C] border-[#C3DEC8] hover:border-[#1E4D3A]'
                 }`}
               >
-                🥣 Ăn Tại Quán
+                Ăn Tại Quán
               </button>
 
               <button
                 type="button"
                 onClick={() => setOrderType('TAKEAWAY')}
-                className={`p-2.5 rounded-xl border text-xs font-bold transition-all ${
+                className={`p-2.5 rounded-xl border text-xs font-bold transition-all text-center ${
                   orderType === 'TAKEAWAY'
-                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                    : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-300'
+                    ? 'bg-[#1E4D3A] text-[#F4F8F5] border-[#1E4D3A] shadow-xs'
+                    : 'bg-white text-[#536B5C] border-[#C3DEC8] hover:border-[#1E4D3A]'
                 }`}
               >
-                🥡 Đóng Hộp Mang Về
+                Mang Về
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOrderType('WHOLESALE')}
+                className={`p-2.5 rounded-xl border text-xs font-bold transition-all text-center ${
+                  orderType === 'WHOLESALE'
+                    ? 'bg-[#2E7D52] text-white border-[#2E7D52] shadow-xs'
+                    : 'bg-white text-[#536B5C] border-[#C3DEC8] hover:border-[#2E7D52]'
+                }`}
+              >
+                Đặt Sỉ / Cỗ
               </button>
             </div>
           </div>
 
-          {/* Note Input */}
+          {/* Note */}
           <div>
-            <label className="text-xs font-bold text-slate-800 mb-1 flex items-center gap-1">
-              <MessageSquare className="w-3.5 h-3.5 text-emerald-600" /> Ghi chú (Cho nhiều vừng, ít dừa...)
+            <label className="text-xs font-bold text-[#1D2A22] mb-1 flex items-center gap-1">
+              <MessageSquare className="w-3.5 h-3.5 text-[#2E7D52]" /> Ghi chú cho bếp (nhiều vừng, không hành...)
             </label>
             <input
               type="text"
-              placeholder="VD: Không lấy hành phi, lấy thêm thìa..."
+              placeholder="VD: Không lấy hành phi, cho thêm muối vừng..."
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl"
+              className="w-full text-xs p-2.5 bg-white border border-[#C3DEC8] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1E4D3A]"
             />
           </div>
 
-          {/* Summary */}
-          <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs flex justify-between items-center font-bold">
-            <span className="text-slate-700">Tổng tiền ({cart.reduce((s,i)=>s+i.quantity,0)} món):</span>
-            <span className="text-emerald-950 font-black text-base font-mono">
-              {pricing.finalTotal.toLocaleString()}đ
-            </span>
+          {/* Summary Box */}
+          <div className="p-3.5 bg-white rounded-2xl border border-[#D4E7D8] text-xs space-y-2">
+            <div className="flex justify-between items-center font-bold">
+              <span className="text-[#536B5C]">Tổng tiền ({cart.reduce((s,i)=>s+i.quantity,0)} phần xôi):</span>
+              <span className="text-[#1E4D3A] font-bold text-base font-heading">
+                {pricing.finalTotal.toLocaleString()}đ
+              </span>
+            </div>
+
+            <div className="pt-2 border-t border-[#EAF3EC] flex items-center justify-between text-[11px] text-[#536B5C]">
+              <span>Thanh toán: Tiền mặt hoặc Chuyển khoản</span>
+              {onOpenPaymentQR && (
+                <button
+                  type="button"
+                  onClick={onOpenPaymentQR}
+                  className="text-[#2E7D52] font-bold underline hover:text-[#1E4D3A] flex items-center gap-1"
+                >
+                  <CreditCard className="w-3 h-3 text-[#2E7D52]" />
+                  <span>Mã QR Chủ Quán</span>
+                </button>
+              )}
+            </div>
           </div>
 
-          <div className="text-[11px] text-emerald-800 text-center font-medium">
-            💡 Bạn có thể thanh toán tiền mặt hoặc chuyển khoản QR sau khi nhận xôi.
+          {/* Notice */}
+          <div className="text-[11px] text-[#1E4D3A] bg-[#E8F5EE] p-2.5 rounded-xl border border-[#BFE0C8] flex items-start gap-1.5">
+            <AlertCircle className="w-3.5 h-3.5 text-[#2E7D52] shrink-0 mt-0.5" />
+            <span>Quán chưa hỗ trợ giao hàng tận nơi. Quý khách vui lòng nhận xôi tại quán hoặc gửi ship đến lấy.</span>
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95"
+            className="w-full bg-[#1E4D3A] hover:bg-[#143527] text-[#F4F8F5] font-bold text-xs sm:text-sm py-3.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-98 border border-[#143527]"
           >
             <Send className="w-4 h-4" />
             <span>GỬI ĐƠN CHO BẾP NGAY</span>
@@ -157,3 +201,5 @@ export default function CheckoutModal({ isOpen, onClose, cart, pricing, onComple
     </div>
   );
 }
+
+

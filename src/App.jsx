@@ -7,9 +7,10 @@ import CheckoutModal from './components/CheckoutModal';
 import OrderSuccessModal from './components/OrderSuccessModal';
 import VendorDashboard from './components/VendorDashboard';
 import QRCodeModal from './components/QRCodeModal';
+import OwnerPaymentModal from './components/OwnerPaymentModal';
 import Footer from './components/Footer';
 import { MENU_ITEMS, STALL_INFO } from './data/menuData';
-import { Check, ShoppingBag } from 'lucide-react';
+import { Check, ShoppingBag, CreditCard } from 'lucide-react';
 
 export default function App() {
   const [activeView, setActiveView] = useState('customer'); // 'customer' or 'vendor'
@@ -17,6 +18,8 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
+  const [isPaymentQROpen, setIsPaymentQROpen] = useState(false);
+  const [paymentQRDetails, setPaymentQRDetails] = useState({ suggestedAmount: 0, orderReference: '' });
   const [checkoutPricing, setCheckoutPricing] = useState({ subtotal: 0, discountAmount: 0, shippingFee: 0, finalTotal: 0 });
   const [completedOrder, setCompletedOrder] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
@@ -27,9 +30,9 @@ export default function App() {
       const saved = localStorage.getItem('xois_orders');
       return saved ? JSON.parse(saved) : [
         {
-          orderId: 'XÔÏS-102',
-          customer: { name: 'Khách 02 (Anh Minh)', phone: 'Ăn tại chỗ', address: 'Bàn 2' },
-          cart: [{ name: 'Xôi Gấc Chay', quantity: 2, totalPrice: 50000 }],
+          orderId: 'XP-102',
+          customer: { name: 'Bàn 02 (Anh Minh)', phone: 'Ăn tại chỗ', address: 'Bàn 2' },
+          cart: [{ name: 'Xôi Gấc Phú Thượng', quantity: 2, totalPrice: 50000 }],
           pricing: { finalTotal: 50000 },
           status: 'pending',
           createdAt: '07:15'
@@ -95,6 +98,14 @@ export default function App() {
     setIsCartOpen(true);
   };
 
+  const handleOpenPaymentQR = (amount = 0, reference = '') => {
+    setPaymentQRDetails({
+      suggestedAmount: typeof amount === 'number' ? amount : 0,
+      orderReference: typeof reference === 'string' ? reference : ''
+    });
+    setIsPaymentQROpen(true);
+  };
+
   const handleProceedCheckout = (pricing) => {
     setCheckoutPricing(pricing);
     setIsCheckoutOpen(true);
@@ -110,18 +121,36 @@ export default function App() {
 
   const handleUpdateOrderStatus = (orderId, newStatus) => {
     setOrders(prev => prev.map(o => o.orderId === orderId ? { ...o, status: newStatus } : o));
+    if (newStatus === 'completed') {
+      showToast(`Đã hoàn thành đơn ${orderId}`);
+    }
+  };
+
+  const handleUpdateOrder = (updatedOrder) => {
+    setOrders(prev => prev.map(o => o.orderId === updatedOrder.orderId ? updatedOrder : o));
+    showToast(`Đã lưu thay đổi đơn ${updatedOrder.orderId}`);
+  };
+
+  const handleCreateOrderFromVendor = (newOrder) => {
+    setOrders(prev => [newOrder, ...prev]);
+    showToast(`Đã lên bếp đơn mới ${newOrder.orderId}`);
+  };
+
+  const handleDeleteOrder = (orderId) => {
+    setOrders(prev => prev.filter(o => o.orderId !== orderId));
+    showToast(`Đã hủy đơn ${orderId}`);
   };
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce((sum, item) => sum + item.totalPrice, 0);
 
   return (
-    <div className="min-h-screen flex flex-col font-sans text-slate-900 bg-transparent">
+    <div className="min-h-screen flex flex-col font-sans text-[#231F1C] bg-transparent">
       
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2 border border-emerald-400 animate-slide-up">
-          <div className="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center">
+        <div className="fixed bottom-5 right-5 z-50 bg-[#1E4D3A] text-[#F4F8F5] text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2 border border-[#ADCDB3] animate-slide-up">
+          <div className="w-5 h-5 rounded-full bg-[#2E7D52] text-white flex items-center justify-center">
             <Check className="w-3 h-3 stroke-[3]" />
           </div>
           <span>{toastMessage}</span>
@@ -136,16 +165,23 @@ export default function App() {
         activeView={activeView}
         setActiveView={setActiveView}
         onOpenQRCode={() => setIsQRCodeOpen(true)}
+        onOpenPaymentQR={() => handleOpenPaymentQR(cartTotal)}
       />
 
       {activeView === 'customer' ? (
         /* Customer Mobile Order View */
         <main className="flex-1">
-          <HeroBanner onQuickOrder={handleOpenQuickOrder} />
+          <HeroBanner 
+            onQuickOrder={handleOpenQuickOrder} 
+            onOpenPaymentQR={() => handleOpenPaymentQR()} 
+          />
 
           <MenuSection onAddToCart={handleAddToCart} />
           
-          <Footer onQuickOrder={handleOpenQuickOrder} />
+          <Footer 
+            onQuickOrder={handleOpenQuickOrder} 
+            onOpenPaymentQR={() => handleOpenPaymentQR()} 
+          />
         </main>
       ) : (
         /* Realtime Vendor/Kitchen Live Order Board */
@@ -153,7 +189,11 @@ export default function App() {
           <VendorDashboard
             orders={orders}
             onUpdateStatus={handleUpdateOrderStatus}
+            onUpdateOrder={handleUpdateOrder}
+            onCreateOrder={handleCreateOrderFromVendor}
+            onDeleteOrder={handleDeleteOrder}
             onOpenQRCode={() => setIsQRCodeOpen(true)}
+            onOpenPaymentQR={handleOpenPaymentQR}
           />
         </main>
       )}
@@ -163,17 +203,17 @@ export default function App() {
         <div className="fixed bottom-4 left-4 right-4 z-40 sm:hidden">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-3.5 rounded-2xl shadow-2xl flex items-center justify-between font-bold text-xs border border-emerald-300 animate-pulse-subtle"
+            className="w-full bg-[#1E4D3A] hover:bg-[#143527] text-[#F4F8F5] p-3.5 rounded-2xl shadow-2xl flex items-center justify-between font-bold text-xs border border-[#143527] animate-pulse-subtle"
           >
             <div className="flex items-center gap-2">
-              <div className="bg-white text-emerald-950 font-black text-xs px-2.5 py-1 rounded-lg">
+              <div className="bg-[#E8F5EE] text-[#1E4D3A] font-bold text-xs px-2.5 py-1 rounded-lg">
                 {cartCount} món
               </div>
               <span>Xem Giỏ Hàng</span>
             </div>
-            <div className="flex items-center gap-1 font-mono text-sm font-black">
+            <div className="flex items-center gap-1 text-sm font-bold font-heading">
               <span>{cartTotal.toLocaleString()}đ</span>
-              <ShoppingBag className="w-4 h-4 ml-1" />
+              <ShoppingBag className="w-4 h-4 ml-1 text-[#74C69D]" />
             </div>
           </button>
         </div>
@@ -197,6 +237,7 @@ export default function App() {
           cart={cart}
           pricing={checkoutPricing}
           onCompleteOrder={handleCompleteOrder}
+          onOpenPaymentQR={() => handleOpenPaymentQR(checkoutPricing.finalTotal)}
         />
       )}
 
@@ -205,14 +246,25 @@ export default function App() {
         <OrderSuccessModal
           orderDetails={completedOrder}
           onClose={() => setCompletedOrder(null)}
+          onOpenPaymentQR={(amt, ref) => handleOpenPaymentQR(amt, ref)}
         />
       )}
 
-      {/* Printable QR Code Modal */}
+      {/* Table/Wall QR Printable Modal */}
       {isQRCodeOpen && (
         <QRCodeModal
           isOpen={isQRCodeOpen}
           onClose={() => setIsQRCodeOpen(false)}
+        />
+      )}
+
+      {/* Owner Payment QR & Bank Account Modal */}
+      {isPaymentQROpen && (
+        <OwnerPaymentModal
+          isOpen={isPaymentQROpen}
+          onClose={() => setIsPaymentQROpen(false)}
+          suggestedAmount={paymentQRDetails.suggestedAmount}
+          orderReference={paymentQRDetails.orderReference}
         />
       )}
 
