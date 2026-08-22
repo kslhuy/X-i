@@ -1,6 +1,5 @@
 import React from 'react';
 import { Sparkles, MapPin, Store, AlertCircle, CreditCard, ChevronRight } from 'lucide-react';
-import { STALL_INFO } from '../data/menuData';
 
 export default function HeroBanner({ onQuickOrder, onOpenPaymentQR }) {
   return (
@@ -15,15 +14,10 @@ export default function HeroBanner({ onQuickOrder, onOpenPaymentQR }) {
           {/* Banner Left Information */}
           <div className="space-y-2.5 flex-1">
             
-            {/* Heritage Badge */}
-            <div className="inline-flex items-center gap-1.5 bg-[#E8F5EE] border border-[#BFE0C8] px-3 py-1 rounded-full text-xs font-bold text-[#1E4D3A]">
-              <span>LÀNG NGHỀ TRUYỀN THỐNG PHÚ THƯỢNG</span>
-            </div>
-
             {/* Main Title */}
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold font-heading text-[#1D2A22] tracking-tight leading-snug">
-                {STALL_INFO.name}
+                XôïS — <strong>LÀNG NGHỀ PHÚ THƯỢNG</strong>
               </h1>
               <p className="text-xs sm:text-sm text-[#536B5C] mt-1 font-body leading-relaxed">
                 Đặc sản xôi nếp cái hoa vàng chuẩn vị làng nghề Phú Thượng — đồ bằng chõ gỗ cổ truyền, hạt dẻo ráo ngậy, mộc mạc thơm hương.
@@ -69,4 +63,3 @@ export default function HeroBanner({ onQuickOrder, onOpenPaymentQR }) {
     </section>
   );
 }
-
