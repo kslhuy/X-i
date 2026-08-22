@@ -17,7 +17,6 @@ export default function HeroBanner({ onQuickOrder, onOpenPaymentQR }) {
             
             {/* Heritage Badge */}
             <div className="inline-flex items-center gap-1.5 bg-[#E8F5EE] border border-[#BFE0C8] px-3 py-1 rounded-full text-xs font-bold text-[#1E4D3A]">
-              <span className="w-2 h-2 rounded-full bg-[#2E7D52]" />
               <span>LÀNG NGHỀ TRUYỀN THỐNG PHÚ THƯỢNG</span>
             </div>
 
@@ -70,5 +69,4 @@ export default function HeroBanner({ onQuickOrder, onOpenPaymentQR }) {
     </section>
   );
 }
-
 

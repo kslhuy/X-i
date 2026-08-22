@@ -42,15 +42,11 @@ export default function Footer({ onQuickOrder, onOpenPaymentQR }) {
           
           {/* Column 1: Brand & Heritage Origin */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl overflow-hidden border border-[#52B788]/50 shrink-0 bg-white">
-                <img src="/images/logo_hãng_xôi.jpg" alt="XôïS Logo" className="w-full h-full object-cover" />
-              </div>
-              <div>
-                <h4 className="font-heading font-bold text-lg text-white leading-none">XôïS</h4>
-                <p className="text-[11px] text-[#74C69D] font-medium mt-0.5">Xôi Truyền Thống Phú Thượng</p>
-              </div>
-            </div>
+            <img
+              src="/images/logo_hãng_xôi.jpg"
+              alt="XôïS – Sắc màu cuộc sống"
+              className="h-20 w-auto max-w-full object-contain object-left"
+            />
             <p className="text-xs text-[#A3C7B2] leading-relaxed">
               Kế thừa tinh hoa nghề nấu xôi cổ truyền làng Phú Thượng (Tây Hồ, Hà Nội). Cam kết 100% màu sắc thảo mộc thiên nhiên, hạt nếp dẻo thơm nguyên bản.
             </p>
@@ -122,5 +118,4 @@ export default function Footer({ onQuickOrder, onOpenPaymentQR }) {
     </footer>
   );
 }
-
 

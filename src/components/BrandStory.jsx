@@ -86,8 +86,8 @@ export default function BrandStory() {
 
           {/* Right Brand Photo Grid */}
           <div className="lg:col-span-6 grid grid-cols-2 gap-3">
-            <div className="rounded-2xl overflow-hidden shadow-md border-2 border-amber-200 h-44">
-              <img src="/images/logo_hãng_xôi.jpg" alt="XôïS Logo Detail" className="w-full h-full object-cover hover:scale-105 transition-transform" />
+            <div className="h-44 flex items-center justify-center">
+              <img src="/images/logo_hãng_xôi.jpg" alt="XôïS – Sắc màu cuộc sống" className="w-full h-full object-contain" />
             </div>
             <div className="rounded-2xl overflow-hidden shadow-md border-2 border-amber-200 h-44">
               <img src="/images/xôi_gấc.jpg" alt="Xôi Gấc Chay" className="w-full h-full object-cover hover:scale-105 transition-transform" />

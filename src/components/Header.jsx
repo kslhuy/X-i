@@ -13,30 +13,17 @@ export default function Header({
 }) {
   return (
     <header className="sticky top-0 z-40 indochine-header shadow-xs border-b border-[#C3DEC8]">
-      <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div className="max-w-4xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
         
-        {/* Brand Logo & Heritage Title */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-11 h-11 rounded-2xl overflow-hidden border border-[#ADCDB3] shadow-xs shrink-0 bg-white">
-            <img src="/images/logo_hãng_xôi.jpg" alt="XôïS Logo" className="w-full h-full object-cover" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-heading font-bold text-xl text-[#1E4D3A] tracking-tight">
-                XôïS
-              </span>
-              <span className="vintage-badge text-[10px] font-bold px-2 py-0.5 rounded-full">
-                Xuất xứ Phú Thượng
-              </span>
-            </div>
-            <p className="text-[11px] text-[#536B5C] font-medium line-clamp-1">
-              Bán buôn (sỉ) & Bán lẻ • Nếp cái hoa vàng cổ truyền
-            </p>
-          </div>
-        </div>
+        {/* The logo already includes the brand name and slogan. */}
+        <img
+          src="/images/logo_hãng_xôi.jpg"
+          alt="XôïS – Sắc màu cuộc sống"
+          className="h-14 sm:h-16 w-auto max-w-[150px] sm:max-w-[180px] object-contain shrink-0"
+        />
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2">
           
           {/* Bank Payment QR Quick Trigger */}
           <button
@@ -105,5 +92,4 @@ export default function Header({
     </header>
   );
 }
-
 
