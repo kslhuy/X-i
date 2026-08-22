@@ -143,7 +143,7 @@ export default function OrderEditModal({
 
     const orderTypeLabel = 
       orderType === 'EAT_HERE' ? 'Ăn tại chỗ' : 
-      orderType === 'TAKEAWAY' ? 'Đóng gói mang về' : 'Đặt sỉ / Mâm cỗ';
+      orderType === 'TAKEAWAY' ? 'Đóng gói mang về' : 'Đặt bán buôn / Mâm cỗ';
 
     const updatedOrder = {
       ...(order || {
@@ -242,7 +242,7 @@ export default function OrderEditModal({
                 {[
                   { id: 'EAT_HERE', label: 'Tại Quán' },
                   { id: 'TAKEAWAY', label: 'Mang Về' },
-                  { id: 'WHOLESALE', label: 'Đặt Sỉ' }
+                  { id: 'WHOLESALE', label: 'Đặt Bán Buôn' }
                 ].map(type => (
                   <button
                     key={type.id}
@@ -703,4 +703,3 @@ export default function OrderEditModal({
     </div>
   );
 }
-

@@ -32,8 +32,8 @@ export default function App() {
         {
           orderId: 'XP-102',
           customer: { name: 'Bàn 02 (Anh Minh)', phone: 'Ăn tại chỗ', address: 'Bàn 2' },
-          cart: [{ name: 'Xôi Gấc Phú Thượng', quantity: 2, totalPrice: 50000 }],
-          pricing: { finalTotal: 50000 },
+          cart: [{ name: 'Xôi Gấc Phú Thượng', quantity: 2, totalPrice: 24000 }],
+          pricing: { finalTotal: 24000 },
           status: 'pending',
           createdAt: '07:15'
         }

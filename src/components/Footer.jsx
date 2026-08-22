@@ -12,7 +12,7 @@ export default function Footer({ onQuickOrder, onOpenPaymentQR }) {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#254E3A] pb-3">
             <div>
               <span className="text-[10px] font-bold text-[#74C69D] uppercase tracking-wider bg-[#122B1E] px-2.5 py-0.5 rounded-full border border-[#2E6B4B]">
-                Dịch Vụ Bán Buôn (Sỉ) & Bán Lẻ
+                Dịch Vụ Bán Buôn & Bán Lẻ
               </span>
               <h3 className="font-heading font-bold text-lg text-white mt-1">
                 Nhận Đặt Xôi Cỗ, Sự Kiện & Hội Nghị Số Lượng Lớn
@@ -118,4 +118,3 @@ export default function Footer({ onQuickOrder, onOpenPaymentQR }) {
     </footer>
   );
 }
-

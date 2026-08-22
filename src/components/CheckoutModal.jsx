@@ -31,7 +31,7 @@ export default function CheckoutModal({
 
     const orderTypeLabel = 
       orderType === 'EAT_HERE' ? 'Ăn tại chỗ' : 
-      orderType === 'TAKEAWAY' ? 'Đóng gói mang về' : 'Đặt sỉ / Mâm cỗ';
+      orderType === 'TAKEAWAY' ? 'Đóng gói mang về' : 'Đặt bán buôn / Mâm cỗ';
 
     onCompleteOrder({
       orderId: 'XP-' + Math.floor(100 + Math.random() * 900),
@@ -137,7 +137,7 @@ export default function CheckoutModal({
                     : 'bg-white text-[#536B5C] border-[#C3DEC8] hover:border-[#2E7D52]'
                 }`}
               >
-                Đặt Sỉ / Cỗ
+                Đặt Bán Buôn / Cỗ
               </button>
             </div>
           </div>
@@ -201,5 +201,4 @@ export default function CheckoutModal({
     </div>
   );
 }
-
 

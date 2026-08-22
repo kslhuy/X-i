@@ -145,7 +145,7 @@ export default function VendorDashboard({
                           </span>
                           {order.orderType && (
                             <span className="text-[10px] font-semibold bg-[#2E7D52]/30 text-[#A7F3D0] px-1.5 py-0.5 rounded border border-[#52B788]/30">
-                              {order.orderType === 'EAT_HERE' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Đặt sỉ'}
+                              {order.orderType === 'EAT_HERE' ? 'Tại quán' : order.orderType === 'TAKEAWAY' ? 'Mang về' : 'Bán buôn'}
                             </span>
                           )}
                         </div>
@@ -325,5 +325,4 @@ export default function VendorDashboard({
     </div>
   );
 }
-
 

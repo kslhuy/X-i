@@ -28,7 +28,7 @@ export default function HeroBanner({ onQuickOrder, onOpenPaymentQR }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
               <div className="flex items-center gap-2 text-xs text-[#1D2A22] bg-[#F4F9F6] px-3 py-2 rounded-xl border border-[#D4E7D8]">
                 <Store className="w-4 h-4 text-[#2E7D52] shrink-0" />
-                <span><strong>Bán buôn (sỉ) & Bán lẻ</strong> hàng ngày</span>
+                <span><strong>Bán buôn & Bán lẻ</strong> hàng ngày</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-[#1E4D3A] bg-[#E8F5EE] px-3 py-2 rounded-xl border border-[#BFE0C8]">
                 <AlertCircle className="w-4 h-4 text-[#2E7D52] shrink-0" />
