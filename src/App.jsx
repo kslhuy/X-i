@@ -9,11 +9,12 @@ import VendorDashboard from './components/VendorDashboard';
 import QRCodeModal from './components/QRCodeModal';
 import OwnerPaymentModal from './components/OwnerPaymentModal';
 import Footer from './components/Footer';
-import { MENU_ITEMS, STALL_INFO } from './data/menuData';
+import { MENU_ITEMS, STALL_INFO, WHOLESALE_ITEMS } from './data/menuData';
 import { Check, ShoppingBag } from 'lucide-react';
 
 export default function App() {
   const [activeView, setActiveView] = useState('customer'); // 'customer' or 'vendor'
+  const [orderMode, setOrderMode] = useState('retail'); // 'retail' or 'wholesale'
   const [menuItems, setMenuItems] = useState(() => {
     try {
       const savedPrices = JSON.parse(localStorage.getItem('xois_menu_prices') || '{}');
@@ -42,7 +43,7 @@ export default function App() {
       return STALL_INFO.bank;
     }
   });
-  const [cart, setCart] = useState([]);
+  const [carts, setCarts] = useState({ retail: [], wholesale: [] });
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isQRCodeOpen, setIsQRCodeOpen] = useState(false);
@@ -89,50 +90,66 @@ export default function App() {
     setTimeout(() => setToastMessage(''), 2500);
   };
 
+  const cart = carts[orderMode];
+
+  const updateModeCart = (mode, updater) => {
+    setCarts(prev => ({
+      ...prev,
+      [mode]: typeof updater === 'function' ? updater(prev[mode]) : updater
+    }));
+  };
+
   const handleAddToCart = (item) => {
-    const existingIndex = cart.findIndex(c => c.id === item.id);
-    if (existingIndex > -1) {
-      const updatedCart = [...cart];
-      updatedCart[existingIndex].quantity += 1;
-      updatedCart[existingIndex].totalPrice = updatedCart[existingIndex].unitPrice * updatedCart[existingIndex].quantity;
-      setCart(updatedCart);
-    } else {
-      setCart([
-        ...cart,
+    const mode = item.saleMode === 'wholesale' ? 'wholesale' : 'retail';
+    const addQuantity = item.minQuantity || item.step || 1;
+    setOrderMode(mode);
+    updateModeCart(mode, currentCart => {
+      const existingIndex = currentCart.findIndex(c => c.id === item.id);
+      if (existingIndex > -1) {
+        const updatedCart = [...currentCart];
+        const nextQuantity = updatedCart[existingIndex].quantity + (item.step || 1);
+        updatedCart[existingIndex].quantity = Number(nextQuantity.toFixed(2));
+        updatedCart[existingIndex].totalPrice = Number.isFinite(updatedCart[existingIndex].unitPrice)
+          ? updatedCart[existingIndex].unitPrice * updatedCart[existingIndex].quantity
+          : 0;
+        return updatedCart;
+      }
+
+      const unitPrice = Number.isFinite(item.price) ? item.price : null;
+      return [
+        ...currentCart,
         {
           ...item,
-          quantity: 1,
-          unitPrice: item.price,
-          totalPrice: item.price
+          quantity: addQuantity,
+          unitPrice,
+          totalPrice: Number.isFinite(unitPrice) ? unitPrice * addQuantity : 0,
+          requiresQuote: !Number.isFinite(unitPrice)
         }
-      ]);
-    }
-    showToast(`Đã thêm "${item.name}" (+1)`);
+      ];
+    });
+    showToast(`Đã thêm "${item.name}" (+${addQuantity}${item.unit ? ` ${item.unit}` : ''})`);
   };
 
   const handleUpdateQuantity = (index, newQty) => {
     if (newQty <= 0) {
       const updatedCart = [...cart];
       updatedCart.splice(index, 1);
-      setCart(updatedCart);
+      updateModeCart(orderMode, updatedCart);
     } else {
       const updatedCart = [...cart];
-      updatedCart[index].quantity = newQty;
-      updatedCart[index].totalPrice = updatedCart[index].unitPrice * newQty;
-      setCart(updatedCart);
+      const normalizedQuantity = Number(newQty.toFixed(2));
+      updatedCart[index].quantity = normalizedQuantity;
+      updatedCart[index].totalPrice = Number.isFinite(updatedCart[index].unitPrice)
+        ? updatedCart[index].unitPrice * normalizedQuantity
+        : 0;
+      updateModeCart(orderMode, updatedCart);
     }
   };
 
   const handleRemoveItem = (index) => {
     const updatedCart = [...cart];
     updatedCart.splice(index, 1);
-    setCart(updatedCart);
-  };
-
-  const handleOpenQuickOrder = () => {
-    const popularItem = menuItems.find(i => i.id === 'combo-ngu-sac') || menuItems[0];
-    handleAddToCart(popularItem);
-    setIsCartOpen(true);
+    updateModeCart(orderMode, updatedCart);
   };
 
   const handleUpdateMenuPrices = (updatedPrices) => {
@@ -145,16 +162,16 @@ export default function App() {
       price: normalizedPrices[item.id] > 0 ? normalizedPrices[item.id] : item.price
     })));
 
-    setCart(prev => prev.map(item => {
-      const nextPrice = normalizedPrices[item.id];
-      if (item.isCustom || !(nextPrice > 0)) return item;
-      return {
-        ...item,
-        price: nextPrice,
-        unitPrice: nextPrice,
-        totalPrice: nextPrice * item.quantity
-      };
-    }));
+    updateModeCart('retail', prev => prev.map(item => {
+        const nextPrice = normalizedPrices[item.id];
+        if (item.isCustom || !(nextPrice > 0)) return item;
+        return {
+          ...item,
+          price: nextPrice,
+          unitPrice: nextPrice,
+          totalPrice: nextPrice * item.quantity
+        };
+      }));
 
     showToast('Đã cập nhật giá thực đơn');
   };
@@ -181,7 +198,7 @@ export default function App() {
     const orderObj = { ...newOrder, status: 'pending' };
     setOrders(prev => [orderObj, ...prev]);
     setIsCheckoutOpen(false);
-    setCart([]);
+    updateModeCart(orderMode, []);
     setCompletedOrder(orderObj);
   };
 
@@ -207,8 +224,9 @@ export default function App() {
     showToast(`Đã hủy đơn ${orderId}`);
   };
 
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const cartCount = Number(cart.reduce((sum, item) => sum + item.quantity, 0).toFixed(2));
   const cartTotal = cart.reduce((sum, item) => sum + item.totalPrice, 0);
+  const cartCountLabel = orderMode === 'wholesale' ? `${cartCount} kg` : `${cartCount}`;
 
   return (
     <div className="min-h-screen flex flex-col font-sans text-[#231F1C] bg-transparent">
@@ -232,17 +250,22 @@ export default function App() {
         setActiveView={setActiveView}
         onOpenQRCode={() => setIsQRCodeOpen(true)}
         onOpenPaymentQR={() => handleOpenPaymentQR(cartTotal)}
+        orderMode={orderMode}
+        cartCountLabel={cartCountLabel}
       />
 
       {activeView === 'customer' ? (
         /* Customer Mobile Order View */
         <main className="flex-1">
-          <HeroBanner 
-            onQuickOrder={handleOpenQuickOrder} 
-            onOpenPaymentQR={() => handleOpenPaymentQR()} 
-          />
+          <HeroBanner onOpenPaymentQR={() => handleOpenPaymentQR()} />
 
-          <MenuSection menuItems={menuItems} onAddToCart={handleAddToCart} />
+          <MenuSection
+            menuItems={menuItems}
+            wholesaleItems={WHOLESALE_ITEMS}
+            orderMode={orderMode}
+            onChangeOrderMode={setOrderMode}
+            onAddToCart={handleAddToCart}
+          />
           
           <Footer 
             onOpenPaymentQR={() => handleOpenPaymentQR()} 
@@ -277,12 +300,12 @@ export default function App() {
           >
             <div className="flex items-center gap-2">
               <div className="bg-[#E8F5EE] text-[#1E4D3A] font-bold text-xs px-2.5 py-1 rounded-lg">
-                {cartCount} món
+                {orderMode === 'wholesale' ? cartCountLabel : `${cartCount} món`}
               </div>
-              <span>Xem Giỏ Hàng</span>
+              <span>{orderMode === 'wholesale' ? 'Xem Đơn Bán Buôn' : 'Xem Giỏ Hàng'}</span>
             </div>
             <div className="flex items-center gap-1 text-sm font-bold font-heading">
-              <span>{cartTotal.toLocaleString()}đ</span>
+              <span>{orderMode === 'wholesale' ? 'Chờ báo giá' : `${cartTotal.toLocaleString()}đ`}</span>
               <ShoppingBag className="w-4 h-4 ml-1 text-[#74C69D]" />
             </div>
           </button>
@@ -297,6 +320,7 @@ export default function App() {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
         onProceedCheckout={handleProceedCheckout}
+        orderMode={orderMode}
       />
 
       {/* Checkout Modal */}
@@ -306,6 +330,7 @@ export default function App() {
           onClose={() => setIsCheckoutOpen(false)}
           cart={cart}
           pricing={checkoutPricing}
+          orderMode={orderMode}
           onCompleteOrder={handleCompleteOrder}
           onOpenPaymentQR={() => handleOpenPaymentQR(checkoutPricing.finalTotal)}
         />

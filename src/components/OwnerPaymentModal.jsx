@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Copy, Check, QrCode, CreditCard, Building2, User, ShieldCheck } from 'lucide-react';
+import { X, Copy, Check, QrCode, CreditCard, Building2, User } from 'lucide-react';
 import { STALL_INFO } from '../data/menuData';
 
 export default function OwnerPaymentModal({ isOpen, onClose, suggestedAmount, orderReference, bankInfo }) {
@@ -44,10 +44,6 @@ export default function OwnerPaymentModal({ isOpen, onClose, suggestedAmount, or
 
         {/* QR Code Container */}
         <div className="bg-white rounded-2xl p-4 border border-[#D4E7D8] shadow-xs text-center space-y-3">
-          <div className="inline-flex items-center gap-1 bg-[#E8F5EE] text-[#1E4D3A] text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-[#BFE0C8]">
-            <ShieldCheck className="w-3 h-3 text-[#2E7D52]" /> Quét nhanh bằng mọi App Ngân Hàng / MoMo
-          </div>
-
           <div className="relative inline-block bg-white p-2.5 rounded-2xl border-2 border-[#1E4D3A]/20 shadow-inner">
             <img
               src={qrUrl}
@@ -104,8 +100,8 @@ export default function OwnerPaymentModal({ isOpen, onClose, suggestedAmount, or
         </div>
 
         {/* Note / Memo */}
-        <div className="text-[11px] text-[#536B5C] text-center italic">
-          Nội dung chuyển khoản gợi ý: <span className="font-semibold text-[#1E4D3A] font-mono not-italic">{transferContent}</span>
+        <div className="text-sm font-normal text-[#536B5C] text-center">
+          Nội dung chuyển khoản gợi ý: <span className="font-medium text-[#1E4D3A]">{transferContent}</span>
         </div>
 
         {/* Close Button */}

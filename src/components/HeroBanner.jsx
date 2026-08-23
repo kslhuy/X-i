@@ -1,7 +1,7 @@
 import React from 'react';
-import { Store, AlertCircle, CreditCard, ChevronRight } from 'lucide-react';
+import { Store, AlertCircle, CreditCard } from 'lucide-react';
 
-export default function HeroBanner({ onQuickOrder, onOpenPaymentQR }) {
+export default function HeroBanner({ onOpenPaymentQR }) {
   return (
     <section className="px-4 py-4 sm:py-5">
       <div className="relative mx-auto max-w-4xl overflow-hidden rounded-2xl border border-[#D4E7D8] bg-white p-5 shadow-xs sm:rounded-3xl sm:p-7">
@@ -40,14 +40,6 @@ export default function HeroBanner({ onQuickOrder, onOpenPaymentQR }) {
 
           {/* Quick Actions Column */}
           <div className="shrink-0 w-full md:w-auto flex flex-col sm:flex-row md:flex-col gap-2.5">
-            <button
-              onClick={onQuickOrder}
-              className="flex items-center justify-center gap-2 rounded-xl border border-[#143527] bg-[#1E4D3A] px-6 py-3.5 text-xs font-bold text-[#F4F8F5] shadow-md transition-all hover:bg-[#143527] active:scale-98 sm:text-sm"
-            >
-              <span>Mẹt Xôi Ngũ Sắc Đặc Biệt</span>
-              <ChevronRight className="w-4 h-4 text-[#74C69D]" />
-            </button>
-
             <button
               onClick={onOpenPaymentQR}
               className="bg-[#E8F5EE] hover:bg-[#DCF0E5] text-[#1E4D3A] font-bold text-xs px-4 py-2.5 rounded-xl border border-[#BFE0C8] transition-all flex items-center justify-center gap-2"

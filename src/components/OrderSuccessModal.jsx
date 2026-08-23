@@ -1,18 +1,21 @@
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { CheckCircle2, QrCode, CreditCard, ArrowRight } from 'lucide-react';
+import { CheckCircle2, CreditCard } from 'lucide-react';
 
 export default function OrderSuccessModal({ orderDetails, onClose, onOpenPaymentQR }) {
-  if (!orderDetails) return null;
-
   useEffect(() => {
+    if (!orderDetails) return;
     confetti({
       particleCount: 50,
       spread: 50,
       origin: { y: 0.6 },
       colors: ['#1E4D3A', '#2E7D52', '#52B788', '#E8F5EE']
     });
-  }, []);
+  }, [orderDetails]);
+
+  if (!orderDetails) return null;
+
+  const isWholesale = orderDetails.orderType === 'WHOLESALE' || orderDetails.pricing?.requiresQuote;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#143527]/60 backdrop-blur-md animate-slide-up">
@@ -27,10 +30,14 @@ export default function OrderSuccessModal({ orderDetails, onClose, onOpenPayment
             Đã Tiếp Nhận Đơn Hàng
           </span>
           <h2 className="text-xl font-bold text-[#1D2A22] font-heading mt-2">
-            Bếp Đang Chuẩn Bị Xôi...
+            {isWholesale ? 'Quán Đã Nhận Yêu Cầu' : 'Bếp Đang Chuẩn Bị Xôi...'}
           </h2>
           <p className="text-xs text-[#536B5C] mt-1 font-body">
-            Cảm ơn quý khách <strong>{orderDetails.customer.name}</strong>! Vui lòng giữ số nhận diện và đợi nhận xôi nóng tại quán.
+            {isWholesale ? (
+              <>Cảm ơn <strong>{orderDetails.customer.name}</strong>! Quán sẽ liên hệ để chốt giá/kg, khối lượng và thời gian nhận.</>
+            ) : (
+              <>Cảm ơn quý khách <strong>{orderDetails.customer.name}</strong>! Vui lòng giữ số nhận diện và đợi nhận xôi nóng tại quán.</>
+            )}
           </p>
         </div>
 
@@ -39,14 +46,16 @@ export default function OrderSuccessModal({ orderDetails, onClose, onOpenPayment
           <div className="text-[10px] text-[#869E90] font-semibold uppercase">Mã Đơn Của Quý Khách</div>
           <div className="text-xl font-bold text-[#1E4D3A] font-heading tracking-wider">{orderDetails.orderId}</div>
           <div className="text-xs font-bold text-[#1D2A22] pt-1.5 border-t border-[#EAF3EC] flex justify-between px-2">
-            <span className="text-[#536B5C]">Tổng tiền:</span>
-            <span className="font-heading font-bold text-[#1E4D3A]">{orderDetails.pricing.finalTotal.toLocaleString()}đ</span>
+            <span className="text-[#536B5C]">{isWholesale ? 'Trạng thái giá:' : 'Tổng tiền:'}</span>
+            <span className="font-heading font-bold text-[#1E4D3A]">
+              {isWholesale ? 'Chờ quán báo giá' : `${orderDetails.pricing.finalTotal.toLocaleString()}đ`}
+            </span>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="space-y-2 pt-1">
-          <button
+          {!isWholesale && <button
             onClick={() => {
               onClose();
               if (onOpenPaymentQR) {
@@ -57,7 +66,7 @@ export default function OrderSuccessModal({ orderDetails, onClose, onOpenPayment
           >
             <CreditCard className="w-3.5 h-3.5 text-[#2E7D52]" />
             <span>Mở Mã QR Chuyển Khoản Ngay</span>
-          </button>
+          </button>}
 
           <button
             onClick={onClose}
@@ -71,5 +80,3 @@ export default function OrderSuccessModal({ orderDetails, onClose, onOpenPayment
     </div>
   );
 }
-
-

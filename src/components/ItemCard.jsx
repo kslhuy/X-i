@@ -1,7 +1,10 @@
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { Flame, Plus, Scale } from 'lucide-react';
 
 export default function ItemCard({ item, onAddToCart }) {
+  const isWholesale = item.saleMode === 'wholesale';
+  const addQuantity = item.minQuantity || item.step || 1;
+
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-[#D4E7D8] shadow-xs hover:shadow-md transition-all flex flex-col justify-between p-3.5 group hover:border-[#ADCDB3]">
       
@@ -18,8 +21,9 @@ export default function ItemCard({ item, onAddToCart }) {
             }}
           />
           {item.badge && (
-            <span className="absolute top-1 left-1 bg-[#1E4D3A]/90 backdrop-blur-xs text-[#F4F8F5] text-[9px] font-bold px-2 py-0.5 rounded shadow-xs">
-              {item.badge}
+            <span className="absolute top-1 left-1 bg-[#1E4D3A]/90 backdrop-blur-xs text-[#F4F8F5] text-[9px] font-bold px-2 py-0.5 rounded shadow-xs flex items-center gap-1">
+              {item.badge === 'Món bán chạy' && <Flame className="h-2.5 w-2.5 text-[#FFD166]" />}
+              <span>{item.badge}</span>
             </span>
           )}
         </div>
@@ -40,7 +44,14 @@ export default function ItemCard({ item, onAddToCart }) {
 
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#EAF3EC]">
             <span className="text-base font-bold text-[#1E4D3A] font-heading">
-              {item.price.toLocaleString()}đ
+              {isWholesale ? (
+                <span className="flex items-center gap-1.5 text-sm">
+                  <Scale className="h-3.5 w-3.5" />
+                  Báo giá theo kg
+                </span>
+              ) : (
+                `${item.price.toLocaleString()}đ`
+              )}
             </span>
 
             <button
@@ -48,7 +59,7 @@ export default function ItemCard({ item, onAddToCart }) {
               className="bg-[#1E4D3A] hover:bg-[#143527] text-[#F4F8F5] font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-xs transition-all flex items-center gap-1 active:scale-95 border border-[#143527]"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>Thêm</span>
+              <span>{isWholesale ? `Thêm ${addQuantity} kg` : 'Thêm'}</span>
             </button>
           </div>
         </div>
@@ -57,5 +68,4 @@ export default function ItemCard({ item, onAddToCart }) {
     </div>
   );
 }
-
 

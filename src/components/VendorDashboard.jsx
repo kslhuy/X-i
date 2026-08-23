@@ -30,6 +30,8 @@ export default function VendorDashboard({
   const pendingOrders = orders.filter(o => o.status !== 'completed');
   const completedOrders = orders.filter(o => o.status === 'completed');
   const totalRevenue = completedOrders.reduce((sum, o) => sum + (o.pricing?.finalTotal || 0), 0);
+  const formatItemQuantity = (item) => item.unit ? `${item.quantity} ${item.unit}` : `${item.quantity}x`;
+  const isQuoteOrder = (order) => order.orderType === 'WHOLESALE' || order.pricing?.requiresQuote;
 
   const handleOpenEdit = (order) => {
     setEditingOrder(order);
@@ -110,7 +112,7 @@ export default function VendorDashboard({
                 Trực Tiếp
               </span>
             </h1>
-            <p className="text-xs text-[#A3C7B2]">Quản lý chế biến & tính tiền bàn ăn / mang về</p>
+            <p className="text-xs text-[#A3C7B2]">Quản lý đơn bán lẻ, bán buôn và thu tiền</p>
           </div>
         </div>
 
@@ -366,6 +368,9 @@ export default function VendorDashboard({
                           {order.createdAt}
                         </span>
                         <div className="text-[11px] text-[#A3C7B2] mt-1">{order.customer.phone || 'Ăn tại chỗ'}</div>
+                        {isQuoteOrder(order) && order.customer.timeSlot && (
+                          <div className="mt-0.5 text-[10px] text-[#74C69D]">Nhận: {order.customer.timeSlot}</div>
+                        )}
                       </div>
                     </div>
 
@@ -375,7 +380,7 @@ export default function VendorDashboard({
                         <div key={idx} className="flex justify-between items-start text-xs">
                           <div className="flex items-start gap-1.5 flex-1 min-w-0 pr-2">
                             <span className="font-bold text-[#74C69D] bg-[#2E7D52]/30 px-1.5 py-0.2 rounded text-[11px] shrink-0 border border-[#52B788]/30">
-                              {item.quantity}x
+                              {formatItemQuantity(item)}
                             </span>
                             <div className="min-w-0">
                               <span className="font-semibold text-white">{item.name}</span>
@@ -397,7 +402,11 @@ export default function VendorDashboard({
                             </div>
                           </div>
                           <span className="font-bold text-[#A3C7B2] shrink-0">
-                            {item.unitPrice === 0 ? '0đ' : `${(item.totalPrice || item.unitPrice * item.quantity).toLocaleString()}đ`}
+                            {item.requiresQuote
+                              ? 'Báo giá'
+                              : item.unitPrice === 0
+                                ? '0đ'
+                                : `${(item.totalPrice || item.unitPrice * item.quantity).toLocaleString()}đ`}
                           </span>
                         </div>
                       ))}
@@ -420,9 +429,11 @@ export default function VendorDashboard({
                     <div className="pt-3 border-t border-[#254E3A] space-y-2.5">
                       <div className="flex items-baseline justify-between">
                         <div>
-                          <div className="text-[10px] text-[#A3C7B2] uppercase font-semibold">Cần thu sau cùng:</div>
+                          <div className="text-[10px] text-[#A3C7B2] uppercase font-semibold">
+                            {isQuoteOrder(order) ? 'Trạng thái giá:' : 'Cần thu sau cùng:'}
+                          </div>
                           <div className="text-lg sm:text-xl font-bold text-[#74C69D] font-heading flex items-center gap-1.5">
-                            <span>{order.pricing.finalTotal.toLocaleString()}đ</span>
+                            <span>{isQuoteOrder(order) ? 'Chờ báo giá' : `${order.pricing.finalTotal.toLocaleString()}đ`}</span>
                             {isFree && (
                               <span className="bg-[#2E7D52] text-white text-[10px] px-1.5 py-0.2 rounded font-bold">
                                 FREE
@@ -432,7 +443,7 @@ export default function VendorDashboard({
                         </div>
 
                         {/* Quick Bank QR button with exact amount for this order */}
-                        {onOpenPaymentQR && order.pricing.finalTotal > 0 && (
+                        {onOpenPaymentQR && !isQuoteOrder(order) && order.pricing.finalTotal > 0 && (
                           <button
                             onClick={() => onOpenPaymentQR(order.pricing.finalTotal, order.orderId)}
                             className="text-[11px] bg-[#0D2016] hover:bg-[#254E3A] text-[#74C69D] font-semibold px-2 py-1 rounded-lg border border-[#2E6B4B] flex items-center gap-1 transition-colors"
@@ -444,15 +455,15 @@ export default function VendorDashboard({
                         )}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className={`grid gap-2 ${isQuoteOrder(order) ? 'grid-cols-1' : 'grid-cols-2'}`}>
                         {/* Edit / Add item / Discount button */}
-                        <button
+                        {!isQuoteOrder(order) && <button
                           onClick={() => handleOpenEdit(order)}
                           className="bg-[#183626] hover:bg-[#254E3A] text-[#E8F5EE] font-bold text-xs py-2 px-2.5 rounded-xl transition-all border border-[#2E6B4B] flex items-center justify-center gap-1.5 active:scale-95 shadow-sm"
                         >
                           <Edit3 className="w-3.5 h-3.5 text-[#74C69D]" />
                           <span>Sửa / Giảm Giá</span>
-                        </button>
+                        </button>}
 
                         {/* Complete & Collect Money button */}
                         <button
@@ -460,7 +471,7 @@ export default function VendorDashboard({
                           className="bg-[#2E7D52] hover:bg-[#256D46] text-white font-bold text-xs py-2 px-2.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-1 active:scale-95 border border-[#52B788]/50"
                         >
                           <CheckCircle2 className="w-4 h-4" />
-                          <span>Xong & Thu Tiền</span>
+                          <span>{isQuoteOrder(order) ? 'Đã Xác Nhận' : 'Xong & Thu Tiền'}</span>
                         </button>
                       </div>
                     </div>
@@ -494,7 +505,7 @@ export default function VendorDashboard({
                       <span className="text-[10px] text-[#A3C7B2] font-mono">({order.orderId})</span>
                     </div>
                     <div className="text-[11px] text-[#A3C7B2] mt-0.5 line-clamp-1">
-                      {order.cart.map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                      {order.cart.map(i => `${formatItemQuantity(i)} ${i.name}`).join(', ')}
                     </div>
                     {order.pricing?.isFree && (
                       <span className="text-[9px] bg-[#2E7D52]/40 text-[#A7F3D0] px-1.5 py-0.2 rounded font-bold">
@@ -504,7 +515,7 @@ export default function VendorDashboard({
                   </div>
                   <div className="text-right shrink-0">
                     <div className="font-bold text-[#74C69D] font-heading">
-                      {order.pricing.finalTotal.toLocaleString()}đ
+                      {isQuoteOrder(order) ? 'Đã xác nhận' : `${order.pricing.finalTotal.toLocaleString()}đ`}
                     </div>
                     <span className="text-[10px] text-[#6B8577]">{order.createdAt}</span>
                   </div>

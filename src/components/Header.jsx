@@ -8,7 +8,9 @@ export default function Header({
   activeView,
   setActiveView,
   onOpenQRCode,
-  onOpenPaymentQR
+  onOpenPaymentQR,
+  orderMode,
+  cartCountLabel
 }) {
   const viewSwitcher = (
     <div className="flex w-full items-center gap-1 rounded-xl border border-[#C3DEC8] bg-[#EAF3EC] p-1 sm:w-auto">
@@ -81,13 +83,21 @@ export default function Header({
                 type="button"
                 onClick={onOpenCart}
                 className="relative flex min-h-10 items-center gap-1.5 rounded-xl border border-[#143527] bg-[#1E4D3A] px-3.5 py-2 text-xs font-bold text-[#F4F8F5] shadow-md transition-all hover:bg-[#143527] active:scale-95"
-                aria-label={cartCount > 0 ? `Mở giỏ hàng, có ${cartCount} món` : 'Mở giỏ hàng'}
+                aria-label={cartCount > 0
+                  ? (orderMode === 'wholesale'
+                      ? `Mở đơn bán buôn, tổng ${cartCountLabel}`
+                      : `Mở giỏ hàng, có ${cartCount} món`)
+                  : (orderMode === 'wholesale' ? 'Mở giỏ bán buôn' : 'Mở giỏ hàng')}
               >
                 <ShoppingBag className="h-4 w-4 text-[#74C69D]" />
-                <span>{cartTotal > 0 ? `${cartTotal.toLocaleString()}đ` : 'Giỏ'}</span>
+                <span>
+                  {orderMode === 'wholesale'
+                    ? (cartCount > 0 ? 'Đơn sỉ' : 'Giỏ sỉ')
+                    : (cartTotal > 0 ? `${cartTotal.toLocaleString()}đ` : 'Giỏ')}
+                </span>
                 {cartCount > 0 && (
                   <span className="ml-0.5 rounded-full border border-white/30 bg-[#2E7D52] px-1.5 text-[10px] font-bold text-white shadow-sm">
-                    {cartCount}
+                    {orderMode === 'wholesale' ? cartCountLabel : cartCount}
                   </span>
                 )}
               </button>

@@ -82,7 +82,7 @@ export const MENU_ITEMS = [
     category: 'traditional',
     badge: 'Mộc Mạc',
     description: 'Lạc cúc đỏ hạt mẩy được ninh mềm dẻo quyện chặt cùng từng hạt nếp thơm, chấm muối vừng rang giòn rụm.',
-    isPopular: false
+    isPopular: true
   },
   {
     id: 'xoi-ruoc-nam',
@@ -93,7 +93,7 @@ export const MENU_ITEMS = [
     category: 'savory',
     badge: 'Đậm Vị',
     description: 'Xôi nếp dẻo thơm kèm lớp ruốc nấm hương xào thơm lừng, mặn ngọt vừa vặn và hành phi mộc.',
-    isPopular: true
+    isPopular: false
   },
   {
     id: 'xoi-vo-che',
@@ -105,6 +105,138 @@ export const MENU_ITEMS = [
     badge: 'Hương Vị Tràng An',
     description: 'Xôi vò vàng ươm tơi từng hạt bọc đậu xanh mịn, dùng kèm bát chè đường hoa cau thanh ngọt ngát hương lài truyền thống.',
     isPopular: false
+  }
+];
+
+// Bán buôn được tách riêng khỏi thực đơn bán lẻ vì khách đặt theo cân
+// và giá phụ thuộc vào khối lượng, thời điểm nhận hàng. Không tự đặt giá/kg
+// khi chủ quán chưa cung cấp; đơn sẽ được gửi dưới dạng yêu cầu báo giá.
+export const WHOLESALE_ITEMS = [
+  {
+    id: 'wholesale-xoi-lac',
+    name: 'Xôi Lạc',
+    subtitle: 'Lạc đỏ ninh bùi • Nếp cái hoa vàng',
+    image: '/images/xôi_lạc.jpg',
+    badge: 'Món bán chạy',
+    description: 'Món chủ lực cho quán ăn sáng và điểm bán lại, đóng theo khối lượng đặt.',
+    saleMode: 'wholesale',
+    wholesaleGroup: 'main',
+    unit: 'kg',
+    step: 1,
+    minQuantity: 5,
+    price: null
+  },
+  {
+    id: 'wholesale-xoi-gac',
+    name: 'Xôi Gấc',
+    subtitle: 'Gấc tươi đỏ son • Nếp dẻo thơm',
+    image: '/images/xôi_gấc.jpg',
+    badge: 'Món bán chạy',
+    description: 'Xôi gấc màu đỏ tự nhiên, phù hợp bán sáng, mâm cỗ và đơn số lượng lớn.',
+    saleMode: 'wholesale',
+    wholesaleGroup: 'main',
+    unit: 'kg',
+    step: 1,
+    minQuantity: 5,
+    price: null
+  },
+  {
+    id: 'wholesale-xoi-xeo',
+    name: 'Xôi Xéo',
+    subtitle: 'Đậu xanh thái mỏng • Hành phi thơm',
+    image: '/images/xôi_xéo.jpg',
+    badge: 'Món bán chạy',
+    description: 'Xôi xéo vàng ươm, đậu xanh và hành phi được chuẩn bị đồng đều cho điểm bán.',
+    saleMode: 'wholesale',
+    wholesaleGroup: 'main',
+    unit: 'kg',
+    step: 1,
+    minQuantity: 5,
+    price: null
+  },
+  {
+    id: 'wholesale-xoi-ngu-sac',
+    name: 'Xôi Ngũ Sắc',
+    subtitle: 'Năm sắc vị truyền thống từ thảo mộc',
+    image: '/images/xoi_ngu_sac.jpeg',
+    badge: 'Mâm Cỗ & Gia Đình',
+    description: 'Xôi ngũ sắc tự nhiên, phù hợp đơn mâm cỗ, liên hoan và sự kiện.',
+    saleMode: 'wholesale',
+    wholesaleGroup: 'main',
+    unit: 'kg',
+    step: 1,
+    minQuantity: 5,
+    price: null
+  },
+  {
+    id: 'wholesale-xoi-dua',
+    name: 'Xôi Dừa',
+    subtitle: 'Dừa nạo sợi • Nước cốt béo thanh',
+    image: '/images/xôi_dừa.jpg',
+    badge: 'Vị Dịu Béo',
+    description: 'Xôi dừa dẻo thơm, nước cốt béo thanh và dừa non nạo sợi.',
+    saleMode: 'wholesale',
+    wholesaleGroup: 'main',
+    unit: 'kg',
+    step: 1,
+    minQuantity: 5,
+    price: null
+  },
+  {
+    id: 'wholesale-xoi-dua-vung-den',
+    name: 'Xôi Dừa Vừng Đen',
+    subtitle: 'Vừng đen thơm bùi • Cốt dừa non',
+    image: '/images/xôi_dừa_2.jpg',
+    badge: 'Dinh Dưỡng',
+    description: 'Xôi dừa kết hợp vừng đen rang thơm, vị bùi béo và dễ chia phần.',
+    saleMode: 'wholesale',
+    wholesaleGroup: 'main',
+    unit: 'kg',
+    step: 1,
+    minQuantity: 5,
+    price: null
+  },
+  {
+    id: 'wholesale-xoi-vo',
+    name: 'Xôi Vò',
+    subtitle: 'Đậu xanh mịn • Tơi từng hạt',
+    image: '/images/xôi_vò_chè.jpg',
+    badge: 'Hương Vị Tràng An',
+    description: 'Xôi vò vàng ươm, tơi hạt và phủ đều lớp đậu xanh mịn.',
+    saleMode: 'wholesale',
+    wholesaleGroup: 'main',
+    unit: 'kg',
+    step: 1,
+    minQuantity: 5,
+    price: null
+  },
+  {
+    id: 'wholesale-ruoc-them',
+    name: 'Ruốc Thêm',
+    subtitle: 'Phần phụ ăn kèm • Đóng riêng',
+    image: '/images/xôi_ruốc.jpg',
+    badge: 'Món phụ',
+    description: 'Đặt thêm ruốc theo cân và đóng riêng để tiện chia phần khi bán.',
+    saleMode: 'wholesale',
+    wholesaleGroup: 'addon',
+    unit: 'kg',
+    step: 0.1,
+    minQuantity: 0.1,
+    price: null
+  },
+  {
+    id: 'wholesale-lac-them',
+    name: 'Lạc Thêm',
+    subtitle: 'Phần phụ ăn kèm • Đóng riêng',
+    image: '/images/xôi_lạc.jpg',
+    badge: 'Món phụ',
+    description: 'Lạc thêm dành cho quán cần chia topping hoặc điều chỉnh khẩu vị riêng.',
+    saleMode: 'wholesale',
+    wholesaleGroup: 'addon',
+    unit: 'kg',
+    step: 0.1,
+    minQuantity: 0.1,
+    price: null
   }
 ];
 

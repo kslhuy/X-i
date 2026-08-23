@@ -7,11 +7,14 @@ export default function CartDrawer({
   cart, 
   onUpdateQuantity, 
   onRemoveItem, 
-  onProceedCheckout 
+  onProceedCheckout,
+  orderMode
 }) {
   if (!isOpen) return null;
 
   const subtotal = cart.reduce((sum, item) => sum + item.totalPrice, 0);
+  const isWholesale = orderMode === 'wholesale';
+  const totalQuantity = Number(cart.reduce((sum, item) => sum + item.quantity, 0).toFixed(2));
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-[#143527]/60 backdrop-blur-sm animate-slide-up">
@@ -24,7 +27,9 @@ export default function CartDrawer({
           <div className="p-4 bg-[#1E4D3A] text-[#F4F8F5] flex items-center justify-between shadow-xs">
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-[#74C69D]" />
-              <h2 className="font-heading font-bold text-base">Món Đã Chọn ({cart.reduce((s, i) => s + i.quantity, 0)})</h2>
+              <h2 className="font-heading font-bold text-base">
+                {isWholesale ? `Đơn Bán Buôn (${totalQuantity} kg)` : `Món Đã Chọn (${totalQuantity})`}
+              </h2>
             </div>
             <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-full transition-colors">
               <X className="w-5 h-5" />
@@ -62,15 +67,56 @@ export default function CartDrawer({
 
                     <div className="flex items-center justify-between mt-2">
                       <div className="text-xs font-bold text-[#1E4D3A] font-heading">
-                        {item.totalPrice.toLocaleString()}đ
+                        {item.requiresQuote ? 'Báo giá theo kg' : `${item.totalPrice.toLocaleString()}đ`}
                       </div>
 
-                      <div className="flex items-center gap-2 bg-[#E8F5EE] px-2 py-0.5 rounded-full border border-[#BFE0C8] shadow-xs">
-                        <button onClick={() => onUpdateQuantity(index, item.quantity - 1)} className="text-[#536B5C] hover:text-[#1E4D3A]">
+                      <div className="flex items-center gap-1 bg-[#E8F5EE] px-1.5 py-0.5 rounded-full border border-[#BFE0C8] shadow-xs">
+                        <button
+                          type="button"
+                          aria-label={`Giảm ${item.step || 1} ${item.unit || 'phần'} ${item.name}`}
+                          onClick={() => onUpdateQuantity(index, item.quantity - (item.step || 1))}
+                          className="rounded-full p-1 text-[#536B5C] hover:bg-white hover:text-[#1E4D3A]"
+                        >
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="text-xs font-bold w-4 text-center text-[#1D2A22]">{item.quantity}</span>
-                        <button onClick={() => onUpdateQuantity(index, item.quantity + 1)} className="text-[#536B5C] hover:text-[#1E4D3A]">
+
+                        {isWholesale && item.wholesaleGroup === 'main' ? (
+                          <label className="flex items-center gap-1 text-xs font-bold text-[#1D2A22]">
+                            <span className="sr-only">Số kg {item.name}</span>
+                            <input
+                              key={`${item.id}-${item.quantity}`}
+                              type="number"
+                              inputMode="numeric"
+                              min="1"
+                              step="1"
+                              defaultValue={item.quantity}
+                              onBlur={(event) => {
+                                const enteredQuantity = Number(event.currentTarget.value);
+                                if (!Number.isFinite(enteredQuantity) || enteredQuantity <= 0) {
+                                  event.currentTarget.value = item.quantity;
+                                  return;
+                                }
+                                onUpdateQuantity(index, Math.max(1, Math.round(enteredQuantity)));
+                              }}
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter') event.currentTarget.blur();
+                              }}
+                              className="w-11 border-0 bg-transparent p-0 text-center text-xs font-bold text-[#1D2A22] outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                            />
+                            <span>kg</span>
+                          </label>
+                        ) : (
+                          <span className={`${isWholesale ? 'min-w-10' : 'w-4'} text-center text-xs font-bold text-[#1D2A22]`}>
+                            {item.quantity}{item.unit ? ` ${item.unit}` : ''}
+                          </span>
+                        )}
+
+                        <button
+                          type="button"
+                          aria-label={`Tăng ${item.step || 1} ${item.unit || 'phần'} ${item.name}`}
+                          onClick={() => onUpdateQuantity(index, item.quantity + (item.step || 1))}
+                          className="rounded-full p-1 text-[#536B5C] hover:bg-white hover:text-[#1E4D3A]"
+                        >
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
@@ -85,18 +131,34 @@ export default function CartDrawer({
           {cart.length > 0 && (
             <div className="p-4 bg-white border-t border-[#D4E7D8] space-y-3">
               <div className="flex justify-between items-center text-sm font-bold">
-                <span className="text-[#536B5C]">Tổng tạm tính:</span>
-                <span className="text-[#1E4D3A] text-base font-heading font-bold">{subtotal.toLocaleString()}đ</span>
+                <span className="text-[#536B5C]">{isWholesale ? 'Tổng khối lượng:' : 'Tổng tạm tính:'}</span>
+                <span className="text-[#1E4D3A] text-base font-heading font-bold">
+                  {isWholesale ? `${totalQuantity} kg` : `${subtotal.toLocaleString()}đ`}
+                </span>
               </div>
+
+              {isWholesale && (
+                <p className="rounded-xl border border-[#BFE0C8] bg-[#E8F5EE] p-2.5 text-[11px] leading-relaxed text-[#536B5C]">
+                  Quán sẽ xác nhận giá/kg, tổng tiền và thời gian nhận sau khi tiếp nhận yêu cầu.
+                </p>
+              )}
 
               <button
                 onClick={() => {
                   onClose();
-                  onProceedCheckout({ subtotal, discountAmount: 0, shippingFee: 0, finalTotal: subtotal });
+                  onProceedCheckout({
+                    subtotal,
+                    discountAmount: 0,
+                    shippingFee: 0,
+                    finalTotal: subtotal,
+                    requiresQuote: isWholesale
+                  });
                 }}
                 className="w-full bg-[#1E4D3A] hover:bg-[#143527] text-[#F4F8F5] font-bold text-xs py-3.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-98 border border-[#143527]"
               >
-                <span>XÁC NHẬN ĐƠN HÀNG ({subtotal.toLocaleString()}đ)</span>
+                <span>
+                  {isWholesale ? 'TIẾP TỤC GỬI YÊU CẦU' : `XÁC NHẬN ĐƠN HÀNG (${subtotal.toLocaleString()}đ)`}
+                </span>
                 <ArrowRight className="w-4 h-4 text-[#74C69D]" />
               </button>
             </div>
@@ -107,5 +169,3 @@ export default function CartDrawer({
     </div>
   );
 }
-
-
