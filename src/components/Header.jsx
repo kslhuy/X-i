@@ -1,95 +1,104 @@
 import React from 'react';
-import { ShoppingBag, QrCode, Store, Sparkles, CreditCard } from 'lucide-react';
-import { STALL_INFO } from '../data/menuData';
+import { ShoppingBag, QrCode, CreditCard } from 'lucide-react';
 
-export default function Header({ 
-  cartCount, 
-  cartTotal, 
-  onOpenCart, 
-  activeView, 
-  setActiveView, 
+export default function Header({
+  cartCount,
+  cartTotal,
+  onOpenCart,
+  activeView,
+  setActiveView,
   onOpenQRCode,
-  onOpenPaymentQR 
+  onOpenPaymentQR
 }) {
+  const viewSwitcher = (
+    <div className="flex w-full items-center gap-1 rounded-xl border border-[#C3DEC8] bg-[#EAF3EC] p-1 sm:w-auto">
+      <button
+        type="button"
+        onClick={() => setActiveView('customer')}
+        aria-pressed={activeView === 'customer'}
+        className={`min-h-8 flex-1 rounded-lg px-3 py-1.5 text-xs font-bold transition-all sm:flex-none ${
+          activeView === 'customer'
+            ? 'bg-[#1E4D3A] text-[#F4F8F5] shadow-sm'
+            : 'text-[#536B5C] hover:bg-white/50 hover:text-[#1E4D3A]'
+        }`}
+      >
+        Chọn Món
+      </button>
+
+      <button
+        type="button"
+        onClick={() => setActiveView('vendor')}
+        aria-pressed={activeView === 'vendor'}
+        className={`min-h-8 flex-1 rounded-lg px-3 py-1.5 text-xs font-bold transition-all sm:flex-none ${
+          activeView === 'vendor'
+            ? 'bg-[#143527] text-[#F4F8F5] shadow-sm'
+            : 'text-[#536B5C] hover:bg-white/50 hover:text-[#1E4D3A]'
+        }`}
+      >
+        Bếp Chính
+      </button>
+    </div>
+  );
+
   return (
-    <header className="sticky top-0 z-40 indochine-header shadow-xs border-b border-[#C3DEC8]">
-      <div className="max-w-4xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
-        
-        {/* The logo already includes the brand name and slogan. */}
-        <img
-          src="/images/logo_hãng_xôi.jpg"
-          alt="XôïS – Sắc màu cuộc sống"
-          className="h-14 sm:h-16 w-auto max-w-[150px] sm:max-w-[180px] object-contain shrink-0"
-        />
+    <header className="indochine-header sticky top-0 z-40 border-b border-[#C3DEC8] shadow-[0_4px_18px_rgba(30,77,58,0.07)]">
+      <div className="mx-auto max-w-4xl px-4 py-2 sm:py-3">
+        <div className="flex min-h-11 items-center justify-between gap-3">
+          <img
+            src="/images/logo_hãng_xôi.jpg"
+            alt="XôïS – Sắc màu cuộc sống"
+            className="h-10 w-auto max-w-[118px] shrink-0 object-contain mix-blend-multiply sm:h-14 sm:max-w-[160px]"
+          />
 
-        {/* Action Buttons */}
-        <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2">
-          
-          {/* Bank Payment QR Quick Trigger */}
-          <button
-            onClick={onOpenPaymentQR}
-            className="p-2 sm:px-3 sm:py-1.5 text-[#1E4D3A] bg-[#E8F5EE] hover:bg-[#DCF0E5] rounded-xl transition-all border border-[#BFE0C8] flex items-center gap-1.5 text-xs font-bold shadow-xs"
-            title="Mã QR Chuyển Khoản & STK Chủ Quán"
-          >
-            <CreditCard className="w-3.5 h-3.5 text-[#2E7D52]" />
-            <span className="hidden sm:inline">Chuyển Khoản / STK</span>
-          </button>
-
-          {/* View Switcher: Customer vs Kitchen */}
-          <div className="bg-[#EAF3EC] p-0.5 rounded-xl flex items-center gap-0.5 border border-[#C3DEC8]">
+          <div className="flex items-center justify-end gap-2">
             <button
-              onClick={() => setActiveView('customer')}
-              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeView === 'customer'
-                  ? 'bg-[#1E4D3A] text-[#F4F8F5] shadow-xs'
-                  : 'text-[#536B5C] hover:text-[#1E4D3A]'
-              }`}
+              type="button"
+              onClick={onOpenPaymentQR}
+              className="flex min-h-10 min-w-10 items-center justify-center gap-1.5 rounded-xl border border-[#BFE0C8] bg-[#E8F5EE] p-2.5 text-xs font-bold text-[#1E4D3A] shadow-sm transition-all hover:bg-[#DCF0E5] active:scale-95 sm:px-3"
+              title="Mã QR chuyển khoản và số tài khoản chủ quán"
+              aria-label="Mở mã QR thanh toán"
             >
-              <span>Chọn Món</span>
+              <CreditCard className="h-4 w-4 text-[#2E7D52]" />
+              <span className="hidden md:inline">Thanh toán</span>
             </button>
 
+            <div className="hidden sm:block">
+              {viewSwitcher}
+            </div>
+
             <button
-              onClick={() => setActiveView('vendor')}
-              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeView === 'vendor'
-                  ? 'bg-[#143527] text-[#F4F8F5] shadow-xs'
-                  : 'text-[#536B5C] hover:text-[#1E4D3A]'
-              }`}
+              type="button"
+              onClick={onOpenQRCode}
+              className="hidden min-h-10 items-center gap-1 rounded-xl border border-[#C3DEC8] px-3 py-2 text-xs font-semibold text-[#536B5C] transition-colors hover:bg-[#EAF3EC] hover:text-[#1E4D3A] md:flex"
+              title="In mã QR đặt món dán bàn hoặc quầy"
             >
-              <span>Bếp Chính</span>
+              <QrCode className="h-4 w-4" />
+              <span>In QR Bàn</span>
             </button>
+
+            {activeView === 'customer' && (
+              <button
+                type="button"
+                onClick={onOpenCart}
+                className="relative flex min-h-10 items-center gap-1.5 rounded-xl border border-[#143527] bg-[#1E4D3A] px-3.5 py-2 text-xs font-bold text-[#F4F8F5] shadow-md transition-all hover:bg-[#143527] active:scale-95"
+                aria-label={cartCount > 0 ? `Mở giỏ hàng, có ${cartCount} món` : 'Mở giỏ hàng'}
+              >
+                <ShoppingBag className="h-4 w-4 text-[#74C69D]" />
+                <span>{cartTotal > 0 ? `${cartTotal.toLocaleString()}đ` : 'Giỏ'}</span>
+                {cartCount > 0 && (
+                  <span className="ml-0.5 rounded-full border border-white/30 bg-[#2E7D52] px-1.5 text-[10px] font-bold text-white shadow-sm">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+            )}
           </div>
-
-          {/* Table/Wall QR Printable Code */}
-          <button
-            onClick={onOpenQRCode}
-            className="p-2 text-[#536B5C] hover:text-[#1E4D3A] hover:bg-[#EAF3EC] rounded-xl transition-colors border border-[#C3DEC8] hidden md:flex items-center gap-1 text-xs font-semibold"
-            title="In Mã QR Đặt Món Dán Bàn / Quầy"
-          >
-            <QrCode className="w-3.5 h-3.5" />
-            <span>In QR Bàn</span>
-          </button>
-
-          {/* Quick Cart Button */}
-          {activeView === 'customer' && (
-            <button
-              onClick={onOpenCart}
-              className="relative bg-[#1E4D3A] hover:bg-[#143527] text-[#F4F8F5] font-bold text-xs px-3.5 py-2 rounded-xl shadow-md transition-all flex items-center gap-1.5 active:scale-95 border border-[#143527]"
-            >
-              <ShoppingBag className="w-4 h-4 text-[#74C69D]" />
-              <span>{cartTotal > 0 ? `${cartTotal.toLocaleString()}đ` : 'Giỏ'}</span>
-              {cartCount > 0 && (
-                <span className="bg-[#2E7D52] text-white font-bold text-[10px] px-1.5 py-0.2 rounded-full ml-0.5 shadow-xs border border-white/30">
-                  {cartCount}
-                </span>
-              )}
-            </button>
-          )}
-
         </div>
 
+        <nav className="mt-1.5 sm:hidden" aria-label="Chuyển chế độ xem">
+          {viewSwitcher}
+        </nav>
       </div>
     </header>
   );
 }
-

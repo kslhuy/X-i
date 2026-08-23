@@ -4,7 +4,7 @@ import { UtensilsCrossed } from 'lucide-react';
 
 export default function MenuSection({ menuItems, onAddToCart }) {
   return (
-    <section id="menu-section" className="py-6 px-4 max-w-4xl mx-auto">
+    <section id="menu-section" className="mx-auto max-w-4xl px-4 pb-6 pt-8">
       
       <div className="flex items-center justify-between mb-5 border-b border-[#D4E7D8] pb-3">
         <div>
@@ -32,4 +32,3 @@ export default function MenuSection({ menuItems, onAddToCart }) {
     </section>
   );
 }
-

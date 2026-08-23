@@ -1,10 +1,10 @@
 import React from 'react';
-import { Sparkles, MapPin, Store, AlertCircle, CreditCard, ChevronRight } from 'lucide-react';
+import { Store, AlertCircle, CreditCard, ChevronRight } from 'lucide-react';
 
 export default function HeroBanner({ onQuickOrder, onOpenPaymentQR }) {
   return (
-    <section className="py-5 px-4">
-      <div className="max-w-4xl mx-auto bg-white rounded-3xl p-5 sm:p-7 border border-[#D4E7D8] shadow-xs relative overflow-hidden">
+    <section className="px-4 py-4 sm:py-5">
+      <div className="relative mx-auto max-w-4xl overflow-hidden rounded-2xl border border-[#D4E7D8] bg-white p-5 shadow-xs sm:rounded-3xl sm:p-7">
         
         {/* Subtle decorative background watermark in tea green */}
         <div className="absolute -right-8 -bottom-8 w-44 h-44 rounded-full bg-[#E8F5EE] border border-[#C3DEC8] -z-0 opacity-60 pointer-events-none" />
@@ -16,7 +16,7 @@ export default function HeroBanner({ onQuickOrder, onOpenPaymentQR }) {
             
             {/* Main Title */}
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold font-heading text-[#1D2A22] tracking-tight leading-snug">
+              <h1 className="font-heading text-[22px] font-bold leading-[1.22] tracking-tight text-[#1D2A22] sm:text-3xl sm:leading-snug">
                 XôïS — <strong>LÀNG NGHỀ PHÚ THƯỢNG</strong>
               </h1>
               <p className="text-xs sm:text-sm text-[#536B5C] mt-1 font-body leading-relaxed">
@@ -42,7 +42,7 @@ export default function HeroBanner({ onQuickOrder, onOpenPaymentQR }) {
           <div className="shrink-0 w-full md:w-auto flex flex-col sm:flex-row md:flex-col gap-2.5">
             <button
               onClick={onQuickOrder}
-              className="bg-[#1E4D3A] hover:bg-[#143527] text-[#F4F8F5] font-bold text-xs sm:text-sm px-6 py-3.5 rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-98 border border-[#143527]"
+              className="flex items-center justify-center gap-2 rounded-xl border border-[#143527] bg-[#1E4D3A] px-6 py-3.5 text-xs font-bold text-[#F4F8F5] shadow-md transition-all hover:bg-[#143527] active:scale-98 sm:text-sm"
             >
               <span>Mẹt Xôi Ngũ Sắc Đặc Biệt</span>
               <ChevronRight className="w-4 h-4 text-[#74C69D]" />

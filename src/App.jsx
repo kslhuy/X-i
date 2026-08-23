@@ -10,7 +10,7 @@ import QRCodeModal from './components/QRCodeModal';
 import OwnerPaymentModal from './components/OwnerPaymentModal';
 import Footer from './components/Footer';
 import { MENU_ITEMS, STALL_INFO } from './data/menuData';
-import { Check, ShoppingBag, CreditCard } from 'lucide-react';
+import { Check, ShoppingBag } from 'lucide-react';
 
 export default function App() {
   const [activeView, setActiveView] = useState('customer'); // 'customer' or 'vendor'
@@ -25,6 +25,21 @@ export default function App() {
       }));
     } catch {
       return MENU_ITEMS;
+    }
+  });
+  const [bankInfo, setBankInfo] = useState(() => {
+    try {
+      const savedBankInfo = JSON.parse(localStorage.getItem('xois_bank_info') || '{}');
+      const savedAccountNumber = typeof savedBankInfo.accountNumber === 'string'
+        ? savedBankInfo.accountNumber.trim()
+        : '';
+
+      return {
+        ...STALL_INFO.bank,
+        ...(/^\d{6,20}$/.test(savedAccountNumber) ? { accountNumber: savedAccountNumber } : {})
+      };
+    } catch {
+      return STALL_INFO.bank;
     }
   });
   const [cart, setCart] = useState([]);
@@ -64,6 +79,10 @@ export default function App() {
     const prices = Object.fromEntries(menuItems.map(item => [item.id, item.price]));
     localStorage.setItem('xois_menu_prices', JSON.stringify(prices));
   }, [menuItems]);
+
+  useEffect(() => {
+    localStorage.setItem('xois_bank_info', JSON.stringify(bankInfo));
+  }, [bankInfo]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -138,6 +157,11 @@ export default function App() {
     }));
 
     showToast('Đã cập nhật giá thực đơn');
+  };
+
+  const handleUpdateBankAccount = (accountNumber) => {
+    setBankInfo(prev => ({ ...prev, accountNumber }));
+    showToast('Đã cập nhật số tài khoản ngân hàng');
   };
 
   const handleOpenPaymentQR = (amount = 0, reference = '') => {
@@ -221,8 +245,8 @@ export default function App() {
           <MenuSection menuItems={menuItems} onAddToCart={handleAddToCart} />
           
           <Footer 
-            onQuickOrder={handleOpenQuickOrder} 
             onOpenPaymentQR={() => handleOpenPaymentQR()} 
+            bankInfo={bankInfo}
           />
         </main>
       ) : (
@@ -231,7 +255,9 @@ export default function App() {
           <VendorDashboard
             orders={orders}
             menuItems={menuItems}
+            bankInfo={bankInfo}
             onUpdateMenuPrices={handleUpdateMenuPrices}
+            onUpdateBankAccount={handleUpdateBankAccount}
             onUpdateStatus={handleUpdateOrderStatus}
             onUpdateOrder={handleUpdateOrder}
             onCreateOrder={handleCreateOrderFromVendor}
@@ -309,6 +335,7 @@ export default function App() {
           onClose={() => setIsPaymentQROpen(false)}
           suggestedAmount={paymentQRDetails.suggestedAmount}
           orderReference={paymentQRDetails.orderReference}
+          bankInfo={bankInfo}
         />
       )}
 

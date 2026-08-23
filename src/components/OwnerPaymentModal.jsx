@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import { X, Copy, Check, QrCode, CreditCard, Building2, User, ShieldCheck } from 'lucide-react';
 import { STALL_INFO } from '../data/menuData';
 
-export default function OwnerPaymentModal({ isOpen, onClose, suggestedAmount, orderReference }) {
+export default function OwnerPaymentModal({ isOpen, onClose, suggestedAmount, orderReference, bankInfo }) {
+  const [copied, setCopied] = useState(false);
+
   if (!isOpen) return null;
 
-  const [copied, setCopied] = useState(false);
-  const bank = STALL_INFO.bank;
+  const bank = bankInfo || STALL_INFO.bank;
 
   // Build high-res VietQR format URL
   const transferContent = orderReference ? `XOI ${orderReference}` : 'XOI PHU THUONG';
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://vietqr.me/mb/${bank.accountNumber}/${encodeURIComponent(bank.accountHolder)}/${suggestedAmount || 0}/${encodeURIComponent(transferContent)}&color=1E4D3A&bgcolor=ffffff`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://vietqr.me/mb/${encodeURIComponent(bank.accountNumber)}/${encodeURIComponent(bank.accountHolder)}/${suggestedAmount || 0}/${encodeURIComponent(transferContent)}&color=1E4D3A&bgcolor=ffffff`;
 
   const handleCopyAccount = () => {
     navigator.clipboard.writeText(bank.accountNumber);
@@ -119,4 +120,3 @@ export default function OwnerPaymentModal({ isOpen, onClose, suggestedAmount, or
     </div>
   );
 }
-

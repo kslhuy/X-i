@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { 
   CheckCircle2, Clock, UtensilsCrossed, QrCode, CreditCard, 
-  Edit3, Plus, Gift, Tag, Trash2, ArrowUpRight, Save, X
+  Edit3, Plus, Tag, Save, X
 } from 'lucide-react';
-import { STALL_INFO } from '../data/menuData';
 import OrderEditModal from './OrderEditModal';
 
 export default function VendorDashboard({ 
   orders, 
   menuItems,
+  bankInfo,
   onUpdateMenuPrices,
+  onUpdateBankAccount,
   onUpdateStatus, 
   onUpdateOrder, 
   onCreateOrder, 
@@ -22,6 +23,9 @@ export default function VendorDashboard({
   const [isPriceEditorOpen, setIsPriceEditorOpen] = useState(false);
   const [draftPrices, setDraftPrices] = useState({});
   const [priceError, setPriceError] = useState('');
+  const [isBankEditorOpen, setIsBankEditorOpen] = useState(false);
+  const [draftAccountNumber, setDraftAccountNumber] = useState('');
+  const [bankAccountError, setBankAccountError] = useState('');
 
   const pendingOrders = orders.filter(o => o.status !== 'completed');
   const completedOrders = orders.filter(o => o.status === 'completed');
@@ -50,6 +54,7 @@ export default function VendorDashboard({
   const handleOpenPriceEditor = () => {
     setDraftPrices(Object.fromEntries(menuItems.map(item => [item.id, item.price])));
     setPriceError('');
+    setIsBankEditorOpen(false);
     setIsPriceEditorOpen(true);
   };
 
@@ -67,6 +72,26 @@ export default function VendorDashboard({
     onUpdateMenuPrices(draftPrices);
     setPriceError('');
     setIsPriceEditorOpen(false);
+  };
+
+  const handleOpenBankEditor = () => {
+    setDraftAccountNumber(bankInfo?.accountNumber || '');
+    setBankAccountError('');
+    setIsPriceEditorOpen(false);
+    setIsBankEditorOpen(true);
+  };
+
+  const handleSaveBankAccount = () => {
+    const normalizedAccountNumber = draftAccountNumber.replace(/\s/g, '');
+
+    if (!/^\d{6,20}$/.test(normalizedAccountNumber)) {
+      setBankAccountError('Số tài khoản phải gồm từ 6 đến 20 chữ số.');
+      return;
+    }
+
+    onUpdateBankAccount(normalizedAccountNumber);
+    setBankAccountError('');
+    setIsBankEditorOpen(false);
   };
 
   return (
@@ -96,6 +121,14 @@ export default function VendorDashboard({
           >
             <Edit3 className="w-3.5 h-3.5" />
             <span>Chỉnh Giá Thực Đơn</span>
+          </button>
+
+          <button
+            onClick={handleOpenBankEditor}
+            className="bg-[#E8F5EE] hover:bg-white text-[#1E4D3A] font-bold text-xs px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-md active:scale-95 border border-[#BFE0C8]"
+          >
+            <CreditCard className="w-3.5 h-3.5" />
+            <span>Chỉnh Số Tài Khoản</span>
           </button>
 
           {/* Quick Create Walk-in Order */}
@@ -207,6 +240,74 @@ export default function VendorDashboard({
         </section>
       )}
 
+      {isBankEditorOpen && (
+        <section className="max-w-6xl mx-auto mt-5 bg-[#183626] rounded-2xl border border-[#2E6B4B] shadow-xl overflow-hidden">
+          <div className="px-4 sm:px-5 py-3.5 bg-[#0D2016] border-b border-[#254E3A] flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-bold text-white flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-[#74C69D]" />
+                <span>Quản Lý Tài Khoản Nhận Tiền</span>
+              </h2>
+              <p className="text-[11px] text-[#A3C7B2] mt-0.5">Số tài khoản mới sẽ được dùng ngay trên mã QR và trang khách hàng.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsBankEditorOpen(false)}
+              className="p-2 rounded-xl text-[#A3C7B2] hover:text-white hover:bg-[#254E3A] transition-colors"
+              aria-label="Đóng phần chỉnh số tài khoản"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="p-4 sm:p-5">
+            <label className="block max-w-xl">
+              <span className="text-xs font-semibold text-[#E8F5EE]">Số tài khoản ngân hàng</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                maxLength={20}
+                value={draftAccountNumber}
+                onChange={(event) => {
+                  setDraftAccountNumber(event.target.value.replace(/\D/g, ''));
+                  setBankAccountError('');
+                }}
+                className="mt-2 w-full bg-[#0D2016] text-white border border-[#2E6B4B] rounded-xl py-3 px-4 text-base font-mono font-bold tracking-wider focus:outline-none focus:border-[#74C69D]"
+                placeholder="Nhập số tài khoản nhận tiền"
+                aria-describedby="bank-account-help"
+              />
+            </label>
+
+            <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <p
+                id="bank-account-help"
+                className={`text-[11px] ${bankAccountError ? 'text-red-300' : 'text-[#A3C7B2]'}`}
+              >
+                {bankAccountError || `Ngân hàng: ${bankInfo?.bankName || 'Chưa xác định'} • Chủ tài khoản: ${bankInfo?.accountHolder || 'Chưa xác định'}`}
+              </p>
+              <div className="flex items-center gap-2 self-end sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() => setIsBankEditorOpen(false)}
+                  className="bg-[#122B1E] hover:bg-[#254E3A] text-[#A3C7B2] hover:text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-[#254E3A] transition-colors"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveBankAccount}
+                  className="bg-[#2E7D52] hover:bg-[#256D46] text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-[#52B788]/50 transition-all flex items-center gap-1.5 shadow-md active:scale-95"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Lưu Số Tài Khoản</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Orders Board */}
       <div className="max-w-6xl mx-auto pt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
@@ -237,7 +338,6 @@ export default function VendorDashboard({
               {pendingOrders.map((order) => {
                 const discount = order.pricing?.discountAmount || 0;
                 const isFree = order.pricing?.isFree || false;
-                const subtotal = order.pricing?.subtotal || order.cart.reduce((s, i) => s + (i.totalPrice || i.unitPrice * i.quantity), 0);
 
                 return (
                   <div

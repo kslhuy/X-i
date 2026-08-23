@@ -1,8 +1,8 @@
 import React from 'react';
-import { Phone, MapPin, Clock, CreditCard, ShieldCheck, Copy, Check, Sparkles } from 'lucide-react';
+import { Phone, MapPin, Clock, CreditCard } from 'lucide-react';
 import { STALL_INFO, WHOLESALE_SERVICES } from '../data/menuData';
 
-export default function Footer({ onQuickOrder, onOpenPaymentQR }) {
+export default function Footer({ onOpenPaymentQR, bankInfo = STALL_INFO.bank }) {
   return (
     <footer id="store-info" className="bg-[#122B1E] text-[#E8F5EE] pt-12 pb-8 border-t border-[#254E3A] mt-12">
       <div className="max-w-4xl mx-auto px-4">
@@ -86,11 +86,11 @@ export default function Footer({ onQuickOrder, onOpenPaymentQR }) {
             
             <div className="bg-[#183626] p-3 rounded-2xl border border-[#254E3A] space-y-1.5 text-xs">
               <div className="text-[11px] text-[#A3C7B2]">
-                Ngân hàng: <strong className="text-white">{STALL_INFO.bank.bankName}</strong>
+                Ngân hàng: <strong className="text-white">{bankInfo.bankName}</strong>
               </div>
               <div className="text-[11px] text-[#A3C7B2] flex items-center justify-between">
-                <span>STK: <strong className="text-[#74C69D] font-mono text-sm">{STALL_INFO.bank.accountNumber}</strong></span>
-                <span className="text-[10px] text-[#A3C7B2] uppercase">{STALL_INFO.bank.accountHolder}</span>
+                <span>STK: <strong className="text-[#74C69D] font-mono text-sm">{bankInfo.accountNumber}</strong></span>
+                <span className="text-[10px] text-[#A3C7B2] uppercase">{bankInfo.accountHolder}</span>
               </div>
               
               <button
