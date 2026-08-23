@@ -3,12 +3,12 @@ import {
   X, Plus, Minus, Trash2, Tag, Gift, Percent, DollarSign, 
   Utensils, Check, AlertCircle, ShoppingBag, Coffee, HelpCircle 
 } from 'lucide-react';
-import { MENU_ITEMS } from '../data/menuData';
 
 export default function OrderEditModal({ 
   isOpen, 
   onClose, 
   order, 
+  menuItems,
   onSaveOrder, 
   onDeleteOrder 
 }) {
@@ -22,7 +22,7 @@ export default function OrderEditModal({
   const [note, setNote] = useState(order?.note || '');
   const [cart, setCart] = useState(
     order?.cart ? JSON.parse(JSON.stringify(order.cart)) : [
-      { id: MENU_ITEMS[0].id, name: MENU_ITEMS[0].name, quantity: 1, unitPrice: MENU_ITEMS[0].price, totalPrice: MENU_ITEMS[0].price }
+      { id: menuItems[0].id, name: menuItems[0].name, quantity: 1, unitPrice: menuItems[0].price, totalPrice: menuItems[0].price }
     ]
   );
 
@@ -82,7 +82,7 @@ export default function OrderEditModal({
     const next = [...cart];
     if (next[index].unitPrice === 0) {
       // Restore original price if found in menu or keep default
-      const original = MENU_ITEMS.find(m => m.id === next[index].id);
+      const original = menuItems.find(m => m.id === next[index].id);
       next[index].unitPrice = original ? original.price : (next[index].originalPrice || 25000);
       next[index].isGift = false;
     } else {
@@ -381,7 +381,7 @@ export default function OrderEditModal({
                       : 'text-[#A3C7B2] hover:text-white'
                   }`}
                 >
-                  Thực Đơn Quán ({MENU_ITEMS.length})
+                  Thực Đơn Quán ({menuItems.length})
                 </button>
                 <button
                   type="button"
@@ -399,7 +399,7 @@ export default function OrderEditModal({
 
             {activeTab === 'menu' ? (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-40 overflow-y-auto pr-1">
-                {MENU_ITEMS.map((item) => (
+                {menuItems.map((item) => (
                   <button
                     key={item.id}
                     type="button"

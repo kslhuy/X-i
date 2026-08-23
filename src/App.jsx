@@ -14,6 +14,19 @@ import { Check, ShoppingBag, CreditCard } from 'lucide-react';
 
 export default function App() {
   const [activeView, setActiveView] = useState('customer'); // 'customer' or 'vendor'
+  const [menuItems, setMenuItems] = useState(() => {
+    try {
+      const savedPrices = JSON.parse(localStorage.getItem('xois_menu_prices') || '{}');
+      return MENU_ITEMS.map(item => ({
+        ...item,
+        price: Number.isFinite(savedPrices[item.id]) && savedPrices[item.id] > 0
+          ? savedPrices[item.id]
+          : item.price
+      }));
+    } catch {
+      return MENU_ITEMS;
+    }
+  });
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -46,6 +59,11 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('xois_orders', JSON.stringify(orders));
   }, [orders]);
+
+  useEffect(() => {
+    const prices = Object.fromEntries(menuItems.map(item => [item.id, item.price]));
+    localStorage.setItem('xois_menu_prices', JSON.stringify(prices));
+  }, [menuItems]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -93,9 +111,33 @@ export default function App() {
   };
 
   const handleOpenQuickOrder = () => {
-    const popularItem = MENU_ITEMS.find(i => i.id === 'combo-ngu-sac') || MENU_ITEMS[0];
+    const popularItem = menuItems.find(i => i.id === 'combo-ngu-sac') || menuItems[0];
     handleAddToCart(popularItem);
     setIsCartOpen(true);
+  };
+
+  const handleUpdateMenuPrices = (updatedPrices) => {
+    const normalizedPrices = Object.fromEntries(
+      Object.entries(updatedPrices).map(([id, price]) => [id, Math.round(Number(price))])
+    );
+
+    setMenuItems(prev => prev.map(item => ({
+      ...item,
+      price: normalizedPrices[item.id] > 0 ? normalizedPrices[item.id] : item.price
+    })));
+
+    setCart(prev => prev.map(item => {
+      const nextPrice = normalizedPrices[item.id];
+      if (item.isCustom || !(nextPrice > 0)) return item;
+      return {
+        ...item,
+        price: nextPrice,
+        unitPrice: nextPrice,
+        totalPrice: nextPrice * item.quantity
+      };
+    }));
+
+    showToast('Đã cập nhật giá thực đơn');
   };
 
   const handleOpenPaymentQR = (amount = 0, reference = '') => {
@@ -176,7 +218,7 @@ export default function App() {
             onOpenPaymentQR={() => handleOpenPaymentQR()} 
           />
 
-          <MenuSection onAddToCart={handleAddToCart} />
+          <MenuSection menuItems={menuItems} onAddToCart={handleAddToCart} />
           
           <Footer 
             onQuickOrder={handleOpenQuickOrder} 
@@ -188,6 +230,8 @@ export default function App() {
         <main className="flex-1">
           <VendorDashboard
             orders={orders}
+            menuItems={menuItems}
+            onUpdateMenuPrices={handleUpdateMenuPrices}
             onUpdateStatus={handleUpdateOrderStatus}
             onUpdateOrder={handleUpdateOrder}
             onCreateOrder={handleCreateOrderFromVendor}

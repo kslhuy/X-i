@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { 
   CheckCircle2, Clock, UtensilsCrossed, QrCode, CreditCard, 
-  Edit3, Plus, Gift, Tag, Trash2, ArrowUpRight 
+  Edit3, Plus, Gift, Tag, Trash2, ArrowUpRight, Save, X
 } from 'lucide-react';
 import { STALL_INFO } from '../data/menuData';
 import OrderEditModal from './OrderEditModal';
 
 export default function VendorDashboard({ 
   orders, 
+  menuItems,
+  onUpdateMenuPrices,
   onUpdateStatus, 
   onUpdateOrder, 
   onCreateOrder, 
@@ -17,6 +19,9 @@ export default function VendorDashboard({
 }) {
   const [editingOrder, setEditingOrder] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isPriceEditorOpen, setIsPriceEditorOpen] = useState(false);
+  const [draftPrices, setDraftPrices] = useState({});
+  const [priceError, setPriceError] = useState('');
 
   const pendingOrders = orders.filter(o => o.status !== 'completed');
   const completedOrders = orders.filter(o => o.status === 'completed');
@@ -42,6 +47,28 @@ export default function VendorDashboard({
     setEditingOrder(null);
   };
 
+  const handleOpenPriceEditor = () => {
+    setDraftPrices(Object.fromEntries(menuItems.map(item => [item.id, item.price])));
+    setPriceError('');
+    setIsPriceEditorOpen(true);
+  };
+
+  const handleSavePrices = () => {
+    const hasInvalidPrice = menuItems.some(item => {
+      const price = Number(draftPrices[item.id]);
+      return !Number.isFinite(price) || price <= 0;
+    });
+
+    if (hasInvalidPrice) {
+      setPriceError('Vui lòng nhập giá lớn hơn 0 cho tất cả món.');
+      return;
+    }
+
+    onUpdateMenuPrices(draftPrices);
+    setPriceError('');
+    setIsPriceEditorOpen(false);
+  };
+
   return (
     <div className="bg-[#122B1E] text-[#E8F5EE] min-h-screen p-4 sm:p-6 font-sans">
       
@@ -63,6 +90,14 @@ export default function VendorDashboard({
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            onClick={handleOpenPriceEditor}
+            className="bg-[#E8F5EE] hover:bg-white text-[#1E4D3A] font-bold text-xs px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-md active:scale-95 border border-[#BFE0C8]"
+          >
+            <Edit3 className="w-3.5 h-3.5" />
+            <span>Chỉnh Giá Thực Đơn</span>
+          </button>
+
           {/* Quick Create Walk-in Order */}
           <button
             onClick={handleOpenCreate}
@@ -98,6 +133,79 @@ export default function VendorDashboard({
           </div>
         </div>
       </div>
+
+      {isPriceEditorOpen && (
+        <section className="max-w-6xl mx-auto mt-5 bg-[#183626] rounded-2xl border border-[#2E6B4B] shadow-xl overflow-hidden">
+          <div className="px-4 sm:px-5 py-3.5 bg-[#0D2016] border-b border-[#254E3A] flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-bold text-white flex items-center gap-2">
+                <Edit3 className="w-4 h-4 text-[#74C69D]" />
+                <span>Quản Lý Giá Thực Đơn</span>
+              </h2>
+              <p className="text-[11px] text-[#A3C7B2] mt-0.5">Giá sau khi lưu sẽ hiển thị ngay trên thực đơn khách hàng.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsPriceEditorOpen(false)}
+              className="p-2 rounded-xl text-[#A3C7B2] hover:text-white hover:bg-[#254E3A] transition-colors"
+              aria-label="Đóng phần chỉnh giá"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="p-4 sm:p-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {menuItems.map(item => (
+                <label
+                  key={item.id}
+                  className="bg-[#122B1E] border border-[#254E3A] rounded-xl p-3 flex items-center justify-between gap-3"
+                >
+                  <span className="text-xs font-semibold text-[#E8F5EE] leading-snug">{item.name}</span>
+                  <span className="relative shrink-0">
+                    <input
+                      type="number"
+                      min="1000"
+                      step="1000"
+                      value={draftPrices[item.id] ?? ''}
+                      onChange={(event) => {
+                        setDraftPrices(prev => ({ ...prev, [item.id]: event.target.value }));
+                        setPriceError('');
+                      }}
+                      className="w-28 bg-[#0D2016] text-white border border-[#2E6B4B] rounded-lg py-2 pl-3 pr-7 text-right text-sm font-bold focus:outline-none focus:border-[#74C69D]"
+                      aria-label={`Giá ${item.name}`}
+                    />
+                    <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-[#74C69D] font-bold pointer-events-none">đ</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+
+            <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <p className={`text-[11px] ${priceError ? 'text-red-300' : 'text-[#A3C7B2]'}`}>
+                {priceError || 'Giá được lưu trên thiết bị này và giữ nguyên sau khi tải lại trang.'}
+              </p>
+              <div className="flex items-center gap-2 self-end sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() => setIsPriceEditorOpen(false)}
+                  className="bg-[#122B1E] hover:bg-[#254E3A] text-[#A3C7B2] hover:text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-[#254E3A] transition-colors"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSavePrices}
+                  className="bg-[#2E7D52] hover:bg-[#256D46] text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-[#52B788]/50 transition-all flex items-center gap-1.5 shadow-md active:scale-95"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Lưu Giá & Cập Nhật Thực Đơn</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Orders Board */}
       <div className="max-w-6xl mx-auto pt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -317,6 +425,7 @@ export default function VendorDashboard({
             setEditingOrder(null);
           }}
           order={editingOrder}
+          menuItems={menuItems}
           onSaveOrder={handleSaveOrder}
           onDeleteOrder={onDeleteOrder}
         />
@@ -325,4 +434,3 @@ export default function VendorDashboard({
     </div>
   );
 }
-

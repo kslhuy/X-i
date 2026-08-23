@@ -1,9 +1,8 @@
 import React from 'react';
-import { MENU_ITEMS } from '../data/menuData';
 import ItemCard from './ItemCard';
 import { UtensilsCrossed } from 'lucide-react';
 
-export default function MenuSection({ onAddToCart }) {
+export default function MenuSection({ menuItems, onAddToCart }) {
   return (
     <section id="menu-section" className="py-6 px-4 max-w-4xl mx-auto">
       
@@ -21,7 +20,7 @@ export default function MenuSection({ onAddToCart }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {MENU_ITEMS.map((item) => (
+        {menuItems.map((item) => (
           <ItemCard
             key={item.id}
             item={item}
@@ -33,5 +32,4 @@ export default function MenuSection({ onAddToCart }) {
     </section>
   );
 }
-
 
